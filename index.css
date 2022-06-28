@@ -23,8 +23,8 @@
     grid-template-columns: 1fr 10px 1fr 10px 1fr;
     grid-template-rows: auto 1fr;
     grid-template-areas:
-        "graph-controls gutter-1 code gutter-3 stack"
-        "graph          gutter-1 code gutter-3 stack"
+        "graph-controls gutter-1 code-controls gutter-3 stack"
+        "graph          gutter-1 code          gutter-3 stack"
 }
 
 .gutter-col {
@@ -43,17 +43,22 @@
     grid-area: gutter-3;
 }
 
-.column {
+.cell {
     overflow: hidden;
 }
 
 #graph-controls {
-    margin: 1em;
     grid-area: graph-controls;
+    margin: 1em;
 }
 
 #graph {
     grid-area: graph;
+}
+
+#code-controls {
+    grid-area: code-controls;
+    margin: 1em;
 }
 
 #code {

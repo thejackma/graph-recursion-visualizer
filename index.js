@@ -140,7 +140,7 @@ const eh = cy.edgehandles(defaults);
 
 eh.enableDrawMode();
 
-const controls = Vue.createApp({
+const graphControls = Vue.createApp({
     data() {
         return {
             clickToCreateNodeEnabled: true,
@@ -154,10 +154,10 @@ const controls = Vue.createApp({
             eh.enableDrawMode();
         },
     },
-}).mount('#controls');
+}).mount('#graph-controls');
 
 cy.on('tap', (evt) => {
-    if (!controls.clickToCreateNodeEnabled) {
+    if (!graphControls.clickToCreateNodeEnabled) {
         return;
     }
 
