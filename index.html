@@ -12,22 +12,30 @@
 
 <body>
 
-    <div id="cy">
-    </div>
+    <div class="grid">
 
-    <div id="controls">
-        <span class="form-check form-check-inline form-switch  ms-auto">
-            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" v-model="clickToCreateNodeEnabled">
-            <label class="form-check-label" for="flexSwitchCheckChecked">New Nodes</label>
-        </span>
+        <div id="graph-controls" class="column">
+            <span class="form-check form-check-inline form-switch  ms-auto">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" v-model="clickToCreateNodeEnabled">
+                <label class="form-check-label" for="flexSwitchCheckChecked">New Nodes</label>
+            </span>
 
-        <span class="btn-group ms-auto" role="group">
-            <input type="radio" class="btn-check" name="btnMode" id="btnConnect" autocomplete="off" checked @change="connect">
-            <label class="btn btn-outline-primary" for="btnConnect">Connect</label>
+            <span class="btn-group ms-auto" role="group">
+                <input type="radio" class="btn-check" name="btnMode" id="btnConnect" autocomplete="off" checked @change="connect">
+                <label class="btn btn-outline-primary" for="btnConnect">Connect</label>
 
-            <input type="radio" class="btn-check" name="btnMode" id="btnMove" autocomplete="off" @change="move">
-            <label class="btn btn-outline-primary" for="btnMove">Move</label>
-        </span>
+                <input type="radio" class="btn-check" name="btnMode" id="btnMove" autocomplete="off" @change="move">
+                <label class="btn btn-outline-primary" for="btnMove">Move</label>
+            </span>
+        </div>
+
+        <div id="graph" class="column"> </div>
+        <div id="code" class="column"></div>
+        <div id="stack" class="column"></div>
+
+        <div class="gutter-col gutter-col-1"></div>
+        <div class="gutter-col gutter-col-3"></div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>

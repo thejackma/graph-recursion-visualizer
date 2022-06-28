@@ -1,16 +1,65 @@
-#cy {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 999;
+/* Split.js */
+/* .split {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
 }
 
-#controls {
-    position: absolute;
-    left: 0;
-    top: 0;
+.gutter {
+    background-color: #eee;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+    cursor: col-resize;
+} */
+
+.grid {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 10px 1fr 10px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "graph-controls gutter-1 code gutter-3 stack"
+        "graph          gutter-1 code gutter-3 stack"
+}
+
+.gutter-col {
+    cursor: col-resize;
+    background-color: #eee;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.gutter-col-1 {
+    grid-area: gutter-1;
+}
+
+.gutter-col-3 {
+    grid-area: gutter-3;
+}
+
+.column {
+    overflow: hidden;
+}
+
+#graph-controls {
     margin: 1em;
-    z-index: 99999;
+    grid-area: graph-controls;
+}
+
+#graph {
+    grid-area: graph;
+}
+
+#code {
+    grid-area: code;
+}
+
+#stack {
+    grid-area: stack;
 }

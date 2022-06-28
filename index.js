@@ -1,17 +1,41 @@
 import * as Vue from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
-import cytoscape from 'https://cdn.jsdelivr.net/npm/cytoscape/+esm';
-import edgehandles from 'https://cdn.jsdelivr.net/npm/cytoscape-edgehandles/+esm';
-import chroma from 'https://cdn.jsdelivr.net/npm/chroma-js/+esm';
-import { v4 as uuid } from 'https://cdn.jsdelivr.net/npm/uuid/+esm';
+import cytoscape from 'https://cdn.jsdelivr.net/npm/cytoscape@3/+esm';
+import edgehandles from 'https://cdn.jsdelivr.net/npm/cytoscape-edgehandles@4/+esm';
+import chroma from 'https://cdn.jsdelivr.net/npm/chroma-js@2/+esm';
+import { v4 as uuid } from 'https://cdn.jsdelivr.net/npm/uuid@8/+esm';
+import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.33/+esm';
+import Split from 'https://cdn.jsdelivr.net/npm/split-grid@1/+esm';
+
+Split({
+    minSize: 1,
+    columnGutters: [{
+        track: 1,
+        element: document.querySelector('.gutter-col-1'),
+    }, {
+        track: 3,
+        element: document.querySelector('.gutter-col-3'),
+    }],
+    onDragEnd() {
+        //TODO: save layout
+    },
+});
+
+monaco.editor.create(document.getElementById('code'), {
+    value: [
+        'function x() {',
+        '\tconsole.log("Hello world!");',
+        '}',
+    ].join('\n'),
+    language: 'javascript',
+    automaticLayout: true,
+});
 
 cytoscape.use(edgehandles);
 
 let id = 0;
 
-const container = document.getElementById('cy');
-
 const cy = cytoscape({
-    container: container,
+    container: document.getElementById('graph'),
 
     layout: {
         name: 'concentric',
