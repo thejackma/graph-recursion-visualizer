@@ -8,13 +8,16 @@ import Split from 'https://cdn.jsdelivr.net/npm/split-grid@1/+esm';
 
 Split({
     minSize: 1,
-    columnGutters: [{
-        track: 1,
-        element: document.querySelector('.gutter-col-1'),
-    }, {
-        track: 3,
-        element: document.querySelector('.gutter-col-3'),
-    }],
+    columnGutters: [
+        {
+            track: 1,
+            element: document.querySelector('.gutter-col-1'),
+        },
+        {
+            track: 3,
+            element: document.querySelector('.gutter-col-3'),
+        },
+    ],
     onDragEnd() {
         //TODO: save layout
     },
