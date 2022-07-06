@@ -5,8 +5,8 @@
     grid-template-columns: 1fr 10px 1fr 10px 1fr;
     grid-template-rows: auto 1fr;
     grid-template-areas:
-        "graph-controls gutter-1 code-controls gutter-3 stack"
-        "graph          gutter-1 code          gutter-3 stack"
+        "graph-controls  gutter-1  execution-controls  gutter-3  stack"
+        "graph           gutter-1  editor              gutter-3  stack"
 }
 
 .gutter-col {
@@ -38,13 +38,13 @@
     grid-area: graph;
 }
 
-#code-controls {
-    grid-area: code-controls;
+#execution-controls {
+    grid-area: execution-controls;
     margin: 1em;
 }
 
-#code {
-    grid-area: code;
+#editor {
+    grid-area: editor;
 }
 
 #stack {
