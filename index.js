@@ -250,8 +250,12 @@ async function main() {
             },
             stop() {
                 this._pause();
-                this.operations = null;
-                this.index = -1;
+                if (this.operations) {
+                    while (this.index >= 0) {
+                        this._backward();
+                    }
+                    this.operations = null;
+                }
             },
             replay() {
                 this.stop();
