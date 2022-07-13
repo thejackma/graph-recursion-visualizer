@@ -321,30 +321,30 @@ async function main() {
                 }
 
                 let enter = `
-                    operations.push({
+                    __dfsOperations.push({
                         type: 'push',
                         node,
                     });
                 `;
 
                 let exit = `
-                    operations.push({
+                    __dfsOperations.push({
                         type: 'pop',
                         node,
                     });
                 `
 
                 let userCode = editor.getValue()
-                    .replace('// DFS:in\n', enter)
-                    .replace('// DFS:out\n', exit);
+                    .replace('// DFS:in', enter)
+                    .replace('// DFS:out', exit);
 
                 let code = `
                     function run(nodes) {
-                        const operations = [];
+                        const __dfsOperations = [];
 
                         ${userCode}
 
-                        return operations;
+                        return __dfsOperations;
                     }
 
                     return run(cyNodes);
