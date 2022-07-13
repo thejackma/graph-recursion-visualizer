@@ -233,7 +233,7 @@ async function main() {
                 } else {
                     this._runUserFunction();
                     this._forwardOrPause();
-                    this.playIntervalId = setInterval(() => this._forwardOrPause(), 1000);
+                    this.playIntervalId = setInterval(() => this._forwardOrPause(), 500);
                 }
             },
             _forwardOrPause() {
@@ -295,17 +295,35 @@ async function main() {
                     return;
                 }
 
-                function enter() {
-                }
+                let enter = `
+                    operations.push({
+                        type: 'push',
+                        node,
+                    });
+                `;
 
-                function exit() {
-                }
+                let exit = `
+                    operations.push({
+                        type: 'pop',
+                        node,
+                    });
+                `
 
                 let userCode = editor.getValue()
-                    .replace('// enter\n', 'enter()\n')
-                    .replace('// exit\n', 'exit()\n');
+                    .replace('// DFS:in\n', enter)
+                    .replace('// DFS:out\n', exit);
 
-                let code = enter.toString() + '\n' + exit.toString() + '\n' + userCode + '\n' + 'return run(cyNodes);';
+                let code = `
+                    function run(nodes) {
+                        const operations = [];
+
+                        ${userCode}
+
+                        return operations;
+                    }
+
+                    return run(cyNodes);
+                `;
 
                 let func = new Function('cyNodes', code);
                 this.operations = func(cy.nodes());
