@@ -1,7 +1,6 @@
-import * as Vue from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
-import edgehandles from 'https://cdn.jsdelivr.net/npm/cytoscape-edgehandles@4/+esm';
+import * as Vue from 'https://unpkg.com/vue@3.2.37/dist/vue.esm-browser.js';
 import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.33/+esm';
-import Split from 'https://cdn.jsdelivr.net/npm/split-grid@1/+esm';
+import Split from 'https://cdn.jsdelivr.net/npm/split-grid@1.0.11/+esm';
 
 async function main() {
     Split({
@@ -30,8 +29,6 @@ async function main() {
         automaticLayout: true,
     });
 
-    cytoscape.use(edgehandles);
-
     let id = 0;
 
     let layouts = {
@@ -41,14 +38,14 @@ async function main() {
             levelWidth: (nodes) => { return 100; },
             minNodeSpacing: 100,
         },
-        'Random': {
-            name: 'random',
-        },
         'Dagre': {
             name: 'dagre',
         },
         'Klay': {
             name: 'klay',
+        },
+        'Random': {
+            name: 'random',
         },
     };
 
@@ -192,6 +189,7 @@ async function main() {
             },
             selectLayout(layout) {
                 this.selectedLayout = layout;
+                this.applyLayout();
             },
         },
     }).mount('#graph-controls');
