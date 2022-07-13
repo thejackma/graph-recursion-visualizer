@@ -31,7 +31,6 @@
 
 #graph-controls {
     grid-area: graph-controls;
-    margin: 1em;
 }
 
 #graph {
@@ -40,7 +39,6 @@
 
 #execution-controls {
     grid-area: execution-controls;
-    margin: 1em;
 }
 
 #editor {

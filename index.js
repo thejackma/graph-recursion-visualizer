@@ -1,8 +1,5 @@
 import * as Vue from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
-import cytoscape from 'https://cdn.jsdelivr.net/npm/cytoscape@3/+esm';
 import edgehandles from 'https://cdn.jsdelivr.net/npm/cytoscape-edgehandles@4/+esm';
-import chroma from 'https://cdn.jsdelivr.net/npm/chroma-js@2/+esm';
-import { v4 as uuid } from 'https://cdn.jsdelivr.net/npm/uuid@8/+esm';
 import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.33/+esm';
 import Split from 'https://cdn.jsdelivr.net/npm/split-grid@1/+esm';
 
@@ -37,15 +34,28 @@ async function main() {
 
     let id = 0;
 
-    const cy = cytoscape({
-        container: document.getElementById('graph'),
-
-        layout: {
+    let layouts = {
+        'Concentric': {
             name: 'concentric',
             concentric: (n) => { 0; },
             levelWidth: (nodes) => { return 100; },
             minNodeSpacing: 100,
         },
+        'Random': {
+            name: 'random',
+        },
+        'Dagre': {
+            name: 'dagre',
+        },
+        'Klay': {
+            name: 'klay',
+        },
+    };
+
+    const cy = cytoscape({
+        container: document.getElementById('graph'),
+
+        layout: layouts['Dagre'],
 
         style: [
             {
@@ -166,6 +176,8 @@ async function main() {
         data() {
             return {
                 clickToCreateNodeEnabled: true,
+                layouts: Object.keys(layouts),
+                selectedLayout: 'Dagre',
             };
         },
         methods: {
@@ -175,8 +187,23 @@ async function main() {
             connect() {
                 eh.enableDrawMode();
             },
+            applyLayout() {
+                cy.layout(layouts[this.selectedLayout]).run();
+            },
+            selectLayout(layout) {
+                this.selectedLayout = layout;
+            },
         },
     }).mount('#graph-controls');
+
+    for (let dropdownToggle of document.querySelectorAll('.dropdown-toggle')) {
+        new bootstrap.Dropdown(dropdownToggle);
+    }
+
+    let grid = document.querySelector('.grid');
+    for (let dropdownMenu of document.querySelectorAll('ul.dropdown-menu')) {
+        grid.after(dropdownMenu);
+    }
 
     cy.on('tap', (evt) => {
         if (!graphControls.clickToCreateNodeEnabled) {
