@@ -15,37 +15,6 @@
 
     <div class="grid">
 
-        <div id="graph-controls" class="cell mx-1 my-3">
-            <div>
-                <span class="btn-group m-2" role="group">
-                    <input type="radio" class="btn-check" name="btnMode" id="btnConnect" autocomplete="off" value="Connect" v-model="drawMode" @change="toggleDrawMode" :disabled="!enabled">
-                    <label class="btn btn-outline-primary" for="btnConnect">Connect</label>
-
-                    <input type="radio" class="btn-check" name="btnMode" id="btnMove" autocomplete="off" value="Move" v-model="drawMode" @change="toggleDrawMode">
-                    <label class="btn btn-outline-primary" for="btnMove">Move</label>
-                </span>
-
-                <span class="form-check form-check-inline form-switch m-2">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" v-model="clickToCreateNodeEnabled" :disabled="!enabled">
-                    <label class="form-check-label" for="flexSwitchCheckChecked">New Nodes</label>
-                </span>
-            </div>
-            <div>
-                <span class="btn-group m-2">
-                    <button type="button" class="btn btn-outline-primary" @click="applyLayout">Layout: {{selectedLayoutName}}</button>
-                    <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" id="dropdownMenuLayout" data-bs-toggle="dropdown" aria-expanded="false"
-                        data-bs-reference="parent">
-                        <span class="visually-hidden">Toggle Dropdown</span>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLayout">
-                        <li><a v-for="layoutName in layoutNames" class="dropdown-item" href="#" @click="selectLayout(layoutName)">{{layoutName}}</a></li>
-                    </ul>
-                </span>
-            </div>
-        </div>
-
-        <div id="graph" class="cell"> </div>
-
         <div id="execution-controls" class="cell mx-1 my-3">
             <div>
                 <span class="btn-group m-2" role="group">
@@ -77,6 +46,37 @@
         </div>
 
         <div id="editor" class="cell"></div>
+
+        <div id="graph-controls" class="cell mx-1 my-3">
+            <div>
+                <span class="btn-group m-2" role="group">
+                    <input type="radio" class="btn-check" name="btnMode" id="btnConnect" autocomplete="off" value="Connect" v-model="drawMode" @change="toggleDrawMode" :disabled="!enabled">
+                    <label class="btn btn-outline-primary" for="btnConnect">Connect</label>
+
+                    <input type="radio" class="btn-check" name="btnMode" id="btnMove" autocomplete="off" value="Move" v-model="drawMode" @change="toggleDrawMode">
+                    <label class="btn btn-outline-primary" for="btnMove">Move</label>
+                </span>
+
+                <span class="form-check form-check-inline form-switch m-2">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" v-model="clickToCreateNodeEnabled" :disabled="!enabled">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">New Nodes</label>
+                </span>
+            </div>
+            <div>
+                <span class="btn-group m-2">
+                    <button type="button" class="btn btn-outline-primary" @click="applyLayout">Layout: {{selectedLayoutName}}</button>
+                    <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" id="dropdownMenuLayout" data-bs-toggle="dropdown" aria-expanded="false"
+                        data-bs-reference="parent">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLayout">
+                        <li><a v-for="layoutName in layoutNames" class="dropdown-item" href="#" @click="selectLayout(layoutName)">{{layoutName}}</a></li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+
+        <div id="graph" class="cell"> </div>
 
         <div id="stack" class="cell"></div>
 
