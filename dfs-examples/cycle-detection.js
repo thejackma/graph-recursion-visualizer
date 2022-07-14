@@ -22,6 +22,7 @@ function hasCycle(node) {
 
     for (let nextNode of node.outgoers('node')) {
         if (hasCycle(nextNode)) {
+            // DFS:out
             return true;
         }
     }

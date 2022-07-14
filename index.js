@@ -239,6 +239,7 @@ async function main() {
         data() {
             return {
                 operations: null,
+                stack: [],
                 index: -1,
                 playIntervalId: 0,
                 exampleNames: Object.keys(examplePaths),
@@ -284,6 +285,7 @@ async function main() {
                         this._backward();
                     }
                     this.operations = null;
+                    this.stack = [];
                 }
             },
             replay() {
@@ -300,11 +302,11 @@ async function main() {
                 this._forward();
             },
             _backward() {
-                let operation = this.operations[this.index];
+                const operation = this.operations[this.index];
                 if (operation.type === 'push') {
-                    operation.node.removeClass('highlighted');
+                    this._pop(operation.node);
                 } else {
-                    operation.node.addClass('highlighted');
+                    this._push(operation.node);
                 }
 
                 this.index--;
@@ -312,11 +314,38 @@ async function main() {
             _forward() {
                 this.index++;
 
-                let operation = this.operations[this.index];
+                const operation = this.operations[this.index];
                 if (operation.type === 'push') {
-                    operation.node.addClass('highlighted');
+                    this._push(operation.node);
                 } else {
-                    operation.node.removeClass('highlighted');
+                    this._pop(operation.node);
+                }
+            },
+            _push(curr) {
+                curr.addClass('highlighted');
+                const prev = this._stackTop();
+                if (prev) {
+                    for (const edge of prev.edgesTo(curr)) {
+                        edge.addClass('highlighted');
+                    }
+                }
+                this.stack.push(curr);
+            },
+            _pop(curr) {
+                curr.removeClass('highlighted');
+                this.stack.pop();
+                const prev = this._stackTop();
+                if (prev) {
+                    for (const edge of prev.edgesTo(curr)) {
+                        edge.removeClass('highlighted');
+                    }
+                }
+            },
+            _stackTop() {
+                if (this.stack.length > 0) {
+                    return this.stack[this.stack.length - 1];
+                } else {
+                    return null;
                 }
             },
             _runUserFunction() {
