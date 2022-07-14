@@ -27,11 +27,11 @@ async function main() {
     const defaultExample = 'Basic';
 
     async function fetchExample(exampleName) {
-        let exampleResp = await fetch(examplePaths[exampleName]);
+        const exampleResp = await fetch(examplePaths[exampleName]);
         return await exampleResp.text();
     }
 
-    let editor = monaco.editor.create(document.getElementById('editor'), {
+    const editor = monaco.editor.create(document.getElementById('editor'), {
         value: await fetchExample(defaultExample),
         language: 'javascript',
         automaticLayout: true,
@@ -39,7 +39,7 @@ async function main() {
 
     let id = 0;
 
-    let layouts = {
+    const layouts = {
         'Concentric': {
             name: 'concentric',
             concentric: (n) => { 0; },
@@ -388,25 +388,25 @@ async function main() {
                 editor.updateOptions({ readOnly: true });
                 graphControls.disable();
 
-                let enter = `
+                const enter = `
                     __dfsOperations.push({
                         type: 'push',
                         node,
                     });
                 `;
 
-                let exit = `
+                const exit = `
                     __dfsOperations.push({
                         type: 'pop',
                         node,
                     });
                 `
 
-                let userCode = editor.getValue()
+                const userCode = editor.getValue()
                     .replaceAll('// DFS:in', enter)
                     .replaceAll('// DFS:out', exit);
 
-                let code = `
+                const code = `
                     function __dfsRun(nodes) {
                         const __dfsOperations = [];
 
@@ -422,7 +422,7 @@ async function main() {
                     return __dfsRun(__dfsNodes);
                 `;
 
-                let func = new Function('__dfsNodes', code);
+                const func = new Function('__dfsNodes', code);
                 this.operations = func(cy.nodes());
             },
             async applyExample(exampleName) {
@@ -432,12 +432,12 @@ async function main() {
         },
     }).mount('#execution-controls');
 
-    for (let dropdownToggle of document.querySelectorAll('.dropdown-toggle')) {
+    for (const dropdownToggle of document.querySelectorAll('.dropdown-toggle')) {
         new bootstrap.Dropdown(dropdownToggle);
     }
 
-    let grid = document.querySelector('.grid');
-    for (let dropdownMenu of document.querySelectorAll('ul.dropdown-menu')) {
+    const grid = document.querySelector('.grid');
+    for (const dropdownMenu of document.querySelectorAll('ul.dropdown-menu')) {
         grid.after(dropdownMenu);
     }
 }

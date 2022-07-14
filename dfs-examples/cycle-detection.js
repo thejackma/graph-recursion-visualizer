@@ -20,7 +20,7 @@ function hasCycle(node) {
 
     status[node.id()] = Status.PENDING;
 
-    for (let nextNode of node.outgoers('node')) {
+    for (const nextNode of node.outgoers('node')) {
         if (hasCycle(nextNode)) {
             // DFS:out
             return true;
