@@ -59,16 +59,20 @@
                     <button type="button" class="btn btn-outline-primary" @click="backward" :disabled="backwardDisabled"><i class="fa-solid fa-backward-step"></i></button>
                     <button type="button" class="btn btn-outline-primary" @click="forward" :disabled="forwardDisabled"><i class="fa-solid fa-forward-step"></i></button>
                 </span>
-            </div>
-            <div>
-                <div class="dropdown m-2">
+
+                <span class="dropdown m-2">
                     <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuExamples" data-bs-toggle="dropdown" aria-expanded="false">
                         Examples
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuExamples">
                         <li><a v-for="exampleName in exampleNames" class="dropdown-item" href="#" @click="applyExample(exampleName)">{{exampleName}}</a></li>
                     </ul>
-                </div>
+                </span>
+            </div>
+            <div>
+                <span class="progress m-2">
+                    <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">{{progress}}%</div>
+                </span>
             </div>
         </div>
 

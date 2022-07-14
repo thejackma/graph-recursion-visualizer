@@ -278,6 +278,13 @@ async function main() {
             playing() {
                 return this.playIntervalId !== 0;
             },
+            progress() {
+                if (this.operations) {
+                    return Math.round((this.index + 1) / this.operations.length * 100);
+                } else {
+                    return 0;
+                }
+            }
         },
         methods: {
             playOrPause() {
