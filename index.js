@@ -41,6 +41,9 @@ async function main() {
         'Dagre': {
             name: 'dagre',
         },
+        'fCoSE': {
+            name: 'fcose',
+        },
         'Klay': {
             name: 'klay',
         },
