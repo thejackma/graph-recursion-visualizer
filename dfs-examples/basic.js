@@ -1,6 +1,6 @@
 const visited = new Set();
 
-for (let node of nodes) {
+for (const node of nodes) {
     dfs(node);
 }
 
@@ -13,8 +13,8 @@ function dfs(node) {
 
     visited.add(node.id());
 
-    for (let outgoer of node.outgoers('edge')) {
-        dfs(outgoer.target());
+    for (const nextNode of node.outgoers('node')) {
+        dfs(nextNode);
     }
 
     // DFS:out

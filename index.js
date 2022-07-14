@@ -20,11 +20,19 @@ async function main() {
         },
     });
 
-    let exampleResp = await fetch('dfs-examples/basic.js');
-    let example = await exampleResp.text();
+    const examplePaths = {
+        'Basic': 'dfs-examples/basic.js',
+        'Cycle Detection': 'dfs-examples/cycle-detection.js',
+    };
+    const defaultExample = 'Basic';
+
+    async function fetchExample(exampleName) {
+        let exampleResp = await fetch(examplePaths[exampleName]);
+        return await exampleResp.text();
+    }
 
     let editor = monaco.editor.create(document.getElementById('editor'), {
-        value: example,
+        value: await fetchExample(defaultExample),
         language: 'javascript',
         automaticLayout: true,
     });
@@ -51,11 +59,12 @@ async function main() {
             name: 'random',
         },
     };
+    const defaultLayout = 'Dagre';
 
     const cy = cytoscape({
         container: document.getElementById('graph'),
 
-        layout: layouts['Dagre'],
+        layout: layouts[defaultLayout],
 
         style: [
             {
@@ -176,8 +185,8 @@ async function main() {
         data() {
             return {
                 clickToCreateNodeEnabled: true,
-                layouts: Object.keys(layouts),
-                selectedLayout: 'Dagre',
+                layoutNames: Object.keys(layouts),
+                selectedLayoutName: defaultLayout,
             };
         },
         methods: {
@@ -188,23 +197,14 @@ async function main() {
                 eh.enableDrawMode();
             },
             applyLayout() {
-                cy.layout(layouts[this.selectedLayout]).run();
+                cy.layout(layouts[this.selectedLayoutName]).run();
             },
-            selectLayout(layout) {
-                this.selectedLayout = layout;
+            selectLayout(layoutName) {
+                this.selectedLayoutName = layoutName;
                 this.applyLayout();
             },
         },
     }).mount('#graph-controls');
-
-    for (let dropdownToggle of document.querySelectorAll('.dropdown-toggle')) {
-        new bootstrap.Dropdown(dropdownToggle);
-    }
-
-    let grid = document.querySelector('.grid');
-    for (let dropdownMenu of document.querySelectorAll('ul.dropdown-menu')) {
-        grid.after(dropdownMenu);
-    }
 
     cy.on('tap', (evt) => {
         if (!graphControls.clickToCreateNodeEnabled) {
@@ -241,6 +241,7 @@ async function main() {
                 operations: null,
                 index: -1,
                 playIntervalId: 0,
+                exampleNames: Object.keys(examplePaths),
             };
         },
         computed: {
@@ -338,26 +339,43 @@ async function main() {
                 `
 
                 let userCode = editor.getValue()
-                    .replace('// DFS:in', enter)
-                    .replace('// DFS:out', exit);
+                    .replaceAll('// DFS:in', enter)
+                    .replaceAll('// DFS:out', exit);
 
                 let code = `
-                    function run(nodes) {
+                    function __dfsRun(nodes) {
                         const __dfsOperations = [];
 
-                        ${userCode}
+                        function __dfsUserCode() {
+                            ${userCode}
+                        }
+
+                        __dfsUserCode();
 
                         return __dfsOperations;
                     }
 
-                    return run(cyNodes);
+                    return __dfsRun(__dfsNodes);
                 `;
 
-                let func = new Function('cyNodes', code);
+                let func = new Function('__dfsNodes', code);
                 this.operations = func(cy.nodes());
+            },
+            async applyExample(exampleName) {
+                const example = await fetchExample(exampleName);
+                editor.setValue(example);
             },
         },
     }).mount('#execution-controls');
+
+    for (let dropdownToggle of document.querySelectorAll('.dropdown-toggle')) {
+        new bootstrap.Dropdown(dropdownToggle);
+    }
+
+    let grid = document.querySelector('.grid');
+    for (let dropdownMenu of document.querySelectorAll('ul.dropdown-menu')) {
+        grid.after(dropdownMenu);
+    }
 }
 
 main();

@@ -32,13 +32,13 @@
             </div>
             <div>
                 <span class="btn-group m-2">
-                    <button type="button" class="btn btn-outline-primary" @click="applyLayout">Layout: {{selectedLayout}}</button>
-                    <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" id="dropdownMenuReference" data-bs-toggle="dropdown" aria-expanded="false"
+                    <button type="button" class="btn btn-outline-primary" @click="applyLayout">Layout: {{selectedLayoutName}}</button>
+                    <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" id="dropdownMenuLayout" data-bs-toggle="dropdown" aria-expanded="false"
                         data-bs-reference="parent">
                         <span class="visually-hidden">Toggle Dropdown</span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuReference">
-                        <li><a v-for="layout in layouts" class="dropdown-item" href="#" @click="selectLayout(layout)">{{layout}}</a></li>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLayout">
+                        <li><a v-for="layoutName in layoutNames" class="dropdown-item" href="#" @click="selectLayout(layoutName)">{{layoutName}}</a></li>
                     </ul>
                 </span>
             </div>
@@ -47,17 +47,29 @@
         <div id="graph" class="cell"> </div>
 
         <div id="execution-controls" class="cell mx-1 my-3">
-            <span class="btn-group mx-2" role="group">
-                <button type="button" class="btn btn-outline-primary" @click="playOrPause" :disabled="forwardDisabled"><i class="fa-solid"
-                        :class="{ 'fa-play': !playing, 'fa-pause': playing }"></i></button>
-                <button type="button" class="btn btn-outline-primary" @click="stop" :disabled="!operations"><i class="fa-solid fa-stop"></i></button>
-                <button type="button" class="btn btn-outline-primary" @click="replay" :disabled="!operations"><i class="fa-solid fa-rotate-right"></i></button>
-            </span>
+            <div>
+                <span class="btn-group m-2" role="group">
+                    <button type="button" class="btn btn-outline-primary" @click="playOrPause" :disabled="forwardDisabled"><i class="fa-solid"
+                            :class="{ 'fa-play': !playing, 'fa-pause': playing }"></i></button>
+                    <button type="button" class="btn btn-outline-primary" @click="stop" :disabled="!operations"><i class="fa-solid fa-stop"></i></button>
+                    <button type="button" class="btn btn-outline-primary" @click="replay" :disabled="!operations"><i class="fa-solid fa-rotate-right"></i></button>
+                </span>
 
-            <span class="btn-group mx-2" role="group">
-                <button type="button" class="btn btn-outline-primary" @click="backward" :disabled="backwardDisabled"><i class="fa-solid fa-backward-step"></i></button>
-                <button type="button" class="btn btn-outline-primary" @click="forward" :disabled="forwardDisabled"><i class="fa-solid fa-forward-step"></i></button>
-            </span>
+                <span class="btn-group m-2" role="group">
+                    <button type="button" class="btn btn-outline-primary" @click="backward" :disabled="backwardDisabled"><i class="fa-solid fa-backward-step"></i></button>
+                    <button type="button" class="btn btn-outline-primary" @click="forward" :disabled="forwardDisabled"><i class="fa-solid fa-forward-step"></i></button>
+                </span>
+            </div>
+            <div>
+                <div class="dropdown m-2">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuExamples" data-bs-toggle="dropdown" aria-expanded="false">
+                        Examples
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuExamples">
+                        <li><a v-for="exampleName in exampleNames" class="dropdown-item" href="#" @click="applyExample(exampleName)">{{exampleName}}</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <div id="editor" class="cell"></div>
