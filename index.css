@@ -47,4 +47,18 @@
 
 #stack {
     grid-area: stack;
+    overflow: scroll;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+        "empty"
+        "frames"
+}
+
+#empty {
+    grid-area: empty;
+}
+
+#frames {
+    grid-area: frames;
 }

@@ -78,7 +78,12 @@
 
         <div id="graph" class="cell"> </div>
 
-        <div id="stack" class="cell"></div>
+        <div id="stack" class="cell">
+            <div id="empty"></div>
+            <ul id="frames" class="list-group">
+                <li v-for="(frame, index) in stack.slice().reverse()" class="list-group-item" :class="{ 'list-group-item-primary': index === 0 }">{{frame.data().id}}</li>
+            </ul>
+        </div>
 
         <div class="gutter-col gutter-col-1"></div>
         <div class="gutter-col gutter-col-3"></div>

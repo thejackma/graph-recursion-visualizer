@@ -68,9 +68,9 @@ async function main() {
 
         style: [
             {
-                selector: 'node[name]',
+                selector: 'node',
                 style: {
-                    'content': 'data(name)',
+                    'label': 'data(id)',
                 },
             },
             {
@@ -146,18 +146,24 @@ async function main() {
 
         elements: {
             nodes: [
-                { data: { id: ++id, name: 'Adam' } },
-                { data: { id: ++id, name: 'Barry' } },
-                { data: { id: ++id, name: 'Charles' } },
-                { data: { id: ++id, name: 'Danny' } },
-                { data: { id: ++id, name: 'Elena' } },
+                { data: { id: 'Adam' } },
+                { data: { id: 'Barry' } },
+                { data: { id: 'Charles' } },
+                { data: { id: 'Danny' } },
+                { data: { id: 'Evan' } },
+                { data: { id: 'Felix' } },
+                { data: { id: 'George' } },
+                { data: { id: 'Harry' } },
             ],
             edges: [
-                { data: { source: 1, target: 2 } },
-                { data: { source: 1, target: 3 } },
-                { data: { source: 2, target: 3 } },
-                { data: { source: 2, target: 4 } },
-                { data: { source: 2, target: 5 } },
+                { data: { source: 'Adam', target: 'Barry' } },
+                { data: { source: 'Adam', target: 'Charles' } },
+                { data: { source: 'Barry', target: 'Charles' } },
+                { data: { source: 'Barry', target: 'Danny' } },
+                { data: { source: 'Danny', target: 'Evan' } },
+                { data: { source: 'Evan', target: 'Felix' } },
+                { data: { source: 'Felix', target: 'George' } },
+                { data: { source: 'Barry', target: 'Harry' } },
             ],
         },
     });
@@ -240,7 +246,7 @@ async function main() {
         }
 
         cy.add({
-            data: { id: ++id, name: id },
+            data: { id: ++id },
             position: {
                 x: evt.position.x,
                 y: evt.position.y,
@@ -257,6 +263,34 @@ async function main() {
         var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
         tgt.remove();
     });
+
+    const stack = Vue.createApp({
+        data() {
+            return {
+                stack: [],
+            };
+        },
+        computed: {
+        },
+        methods: {
+            reset() {
+                this.stack = [];
+            },
+            push(curr) {
+                this.stack.push(curr);
+            },
+            pop() {
+                this.stack.pop();
+            },
+            top() {
+                if (this.stack.length > 0) {
+                    return this.stack[this.stack.length - 1];
+                } else {
+                    return null;
+                }
+            },
+        },
+    }).mount('#stack');
 
     const executionControls = Vue.createApp({
         data() {
@@ -315,7 +349,7 @@ async function main() {
                         this._backward();
                     }
                     this.operations = null;
-                    this.stack = [];
+                    stack.reset();
                     editor.updateOptions({ readOnly: false });
                     graphControls.enable();
                 }
@@ -355,29 +389,22 @@ async function main() {
             },
             _push(curr) {
                 curr.addClass('highlighted');
-                const prev = this._stackTop();
+                const prev = stack.top();
                 if (prev) {
                     for (const edge of prev.edgesTo(curr)) {
                         edge.addClass('highlighted');
                     }
                 }
-                this.stack.push(curr);
+                stack.push(curr);
             },
             _pop(curr) {
                 curr.removeClass('highlighted');
-                this.stack.pop();
-                const prev = this._stackTop();
+                stack.pop();
+                const prev = stack.top();
                 if (prev) {
                     for (const edge of prev.edgesTo(curr)) {
                         edge.removeClass('highlighted');
                     }
-                }
-            },
-            _stackTop() {
-                if (this.stack.length > 0) {
-                    return this.stack[this.stack.length - 1];
-                } else {
-                    return null;
                 }
             },
             _runUserFunction() {
