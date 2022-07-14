@@ -184,17 +184,22 @@ async function main() {
     const graphControls = Vue.createApp({
         data() {
             return {
+                enabled: true,
+                drawMode: 'Connect',
+                previousDrawMode: null,
                 clickToCreateNodeEnabled: true,
+                previousClickToCreateNodeEnabled: null,
                 layoutNames: Object.keys(layouts),
                 selectedLayoutName: defaultLayout,
             };
         },
         methods: {
-            move() {
-                eh.disableDrawMode();
-            },
-            connect() {
-                eh.enableDrawMode();
+            toggleDrawMode() {
+                if (this.drawMode === 'Connect') {
+                    eh.enableDrawMode();
+                } else {
+                    eh.disableDrawMode();
+                }
             },
             applyLayout() {
                 cy.layout(layouts[this.selectedLayoutName]).run();
@@ -203,6 +208,24 @@ async function main() {
                 this.selectedLayoutName = layoutName;
                 this.applyLayout();
             },
+            disable() {
+                if (!this.enabled) {
+                    return;
+                }
+                this.enabled = false;
+                this.previousDrawMode = this.drawMode;
+                this.drawMode = 'Move';
+                this.previousClickToCreateNodeEnabled = this.clickToCreateNodeEnabled;
+                this.clickToCreateNodeEnabled = false;
+            },
+            enable() {
+                if (this.enabled) {
+                    return;
+                }
+                this.enabled = true;
+                this.drawMode = this.previousDrawMode;
+                this.clickToCreateNodeEnabled = this.previousClickToCreateNodeEnabled;
+            }
         },
     }).mount('#graph-controls');
 
@@ -286,6 +309,8 @@ async function main() {
                     }
                     this.operations = null;
                     this.stack = [];
+                    editor.updateOptions({ readOnly: false });
+                    graphControls.enable();
                 }
             },
             replay() {
@@ -352,6 +377,9 @@ async function main() {
                 if (this.operations) {
                     return;
                 }
+
+                editor.updateOptions({ readOnly: true });
+                graphControls.disable();
 
                 let enter = `
                     __dfsOperations.push({
