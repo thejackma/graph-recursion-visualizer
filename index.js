@@ -20,7 +20,7 @@ async function main() {
         },
     });
 
-    let exampleResp = await fetch('dfs-example.js');
+    let exampleResp = await fetch('dfs-examples/basic.js');
     let example = await exampleResp.text();
 
     let editor = monaco.editor.create(document.getElementById('editor'), {

@@ -1,22 +1,21 @@
-const COMPLETE = "COMPLETE";
-const status = {};
+const visited = new Set();
+
+for (let node of nodes) {
+    dfs(node);
+}
 
 function dfs(node) {
-    if (status[node.id()]) {
+    if (visited.has(node.id())) {
         return;
     }
 
     // DFS:in
 
-    status[node.id()] = COMPLETE;
+    visited.add(node.id());
 
     for (let outgoer of node.outgoers('edge')) {
         dfs(outgoer.target());
     }
 
     // DFS:out
-}
-
-for (let node of nodes) {
-    dfs(node);
 }
