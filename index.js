@@ -3,6 +3,14 @@ import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.33/+esm';
 import Split from 'https://cdn.jsdelivr.net/npm/split-grid@1.0.11/+esm';
 
 async function main() {
+    const configKeyGridColumns = 'split-grid-template-columns';
+    const grid = document.querySelector('.grid');
+
+    const gridColumns = localStorage.getItem(configKeyGridColumns);
+    if (gridColumns) {
+        grid.style['grid-template-columns'] = gridColumns;
+    }
+
     Split({
         minSize: 1,
         columnGutters: [
@@ -15,8 +23,8 @@ async function main() {
                 element: document.querySelector('.gutter-col-3'),
             },
         ],
-        onDragEnd() {
-            //TODO: save layout
+        onDragEnd(direction, track) {
+            localStorage.setItem(configKeyGridColumns, grid.style['grid-template-columns']);
         },
     });
 
@@ -463,7 +471,6 @@ async function main() {
         new bootstrap.Dropdown(dropdownToggle);
     }
 
-    const grid = document.querySelector('.grid');
     for (const dropdownMenu of document.querySelectorAll('ul.dropdown-menu')) {
         grid.after(dropdownMenu);
     }
