@@ -1,43 +1,10 @@
 import * as Vue from 'https://unpkg.com/vue@3.2.37/dist/vue.esm-browser.js';
 import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.33/+esm';
-import Split from 'https://cdn.jsdelivr.net/npm/split-grid@1.0.11/+esm';
+import { examplePaths, defaultExample, fetchExample } from './js/example.js'
+import { initGrid } from './js/grid.js';
 
 async function main() {
-    const configKeyGridColumns = 'split-grid-template-columns';
-    const grid = document.querySelector('.grid');
-
-    const gridColumns = localStorage.getItem(configKeyGridColumns);
-    if (gridColumns) {
-        grid.style['grid-template-columns'] = gridColumns;
-    }
-
-    Split({
-        minSize: 1,
-        columnGutters: [
-            {
-                track: 1,
-                element: document.querySelector('.gutter-col-1'),
-            },
-            {
-                track: 3,
-                element: document.querySelector('.gutter-col-3'),
-            },
-        ],
-        onDragEnd(direction, track) {
-            localStorage.setItem(configKeyGridColumns, grid.style['grid-template-columns']);
-        },
-    });
-
-    const examplePaths = {
-        'Basic': 'dfs-examples/basic.js',
-        'Cycle Detection': 'dfs-examples/cycle-detection.js',
-    };
-    const defaultExample = 'Basic';
-
-    async function fetchExample(exampleName) {
-        const exampleResp = await fetch(examplePaths[exampleName]);
-        return await exampleResp.text();
-    }
+    initGrid();
 
     const editor = monaco.editor.create(document.getElementById('editor'), {
         value: await fetchExample(defaultExample),
@@ -471,6 +438,7 @@ async function main() {
         new bootstrap.Dropdown(dropdownToggle);
     }
 
+    const grid = document.querySelector('.grid');
     for (const dropdownMenu of document.querySelectorAll('ul.dropdown-menu')) {
         grid.after(dropdownMenu);
     }
