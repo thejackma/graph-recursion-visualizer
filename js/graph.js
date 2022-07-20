@@ -27,7 +27,7 @@ const names = [
     'Zoey',
 ];
 
-export const layouts = {
+const layouts = {
     'Concentric': {
         name: 'concentric',
         concentric: (n) => { 0; },
@@ -47,7 +47,7 @@ export const layouts = {
         name: 'random',
     },
 };
-export const defaultLayout = 'Dagre';
+const defaultLayout = 'Dagre';
 
 export const cy = cytoscape({
     container: document.getElementById('graph'),
@@ -156,7 +156,7 @@ export const cy = cytoscape({
     },
 });
 
-export const eh = cy.edgehandles({
+const eh = cy.edgehandles({
     canConnect(sourceNode, targetNode) {
         return true;
     },
@@ -173,21 +173,64 @@ export const eh = cy.edgehandles({
 
 eh.enableDrawMode();
 
+export const graphControls = Vue.createApp({
+    data() {
+        return {
+            enabled: true,
+            drawMode: 'Connect',
+            previousDrawMode: null,
+            newNodesEnabled: true,
+            previousNewNodesEnabled: null,
+            layoutNames: Object.keys(layouts),
+            selectedLayoutName: defaultLayout,
+        };
+    },
+    methods: {
+        toggleDrawMode() {
+            if (this.drawMode === 'Connect') {
+                eh.enableDrawMode();
+            } else {
+                eh.disableDrawMode();
+            }
+        },
+        applyLayout() {
+            cy.layout(layouts[this.selectedLayoutName]).run();
+        },
+        selectLayout(layoutName) {
+            this.selectedLayoutName = layoutName;
+            this.applyLayout();
+        },
+        disable() {
+            if (!this.enabled) {
+                return;
+            }
+            this.enabled = false;
+            this.previousDrawMode = this.drawMode;
+            this.drawMode = 'Move';
+            this.previousNewNodesEnabled = this.newNodesEnabled;
+            this.newNodesEnabled = false;
+        },
+        enable() {
+            if (this.enabled) {
+                return;
+            }
+            this.enabled = true;
+            this.drawMode = this.previousDrawMode;
+            this.newNodesEnabled = this.previousNewNodesEnabled;
+        },
+    },
+}).mount('#graph-controls');
+
 const nameSet = new Set(names);
 const remainingNames = new Set(names);
 let id = cy.nodes().length;
-let newNodesEnabled = true;
 
 for (let node of cy.nodes()) {
     remainingNames.delete(node.data().data);
 }
 
-export function setNewNodesEnabled(value) {
-    newNodesEnabled = value;
-}
-
 cy.on('tap', (evt) => {
-    if (!newNodesEnabled) {
+    if (!graphControls.newNodesEnabled) {
         return;
     }
 

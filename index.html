@@ -58,7 +58,7 @@
                 </span>
 
                 <span class="form-check form-check-inline form-switch m-2">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" v-model="computedNewNodesEnabled" :disabled="!enabled">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" v-model="newNodesEnabled" :disabled="!enabled">
                     <label class="form-check-label" for="flexSwitchCheckChecked">New Nodes</label>
                 </span>
             </div>
@@ -81,7 +81,7 @@
         <div id="stack" class="cell">
             <div id="empty"></div>
             <ul id="frames" class="list-group">
-                <li v-for="(frame, index) in stack.slice().reverse()" class="list-group-item" :class="{ 'list-group-item-primary': index === 0 }">{{frame.data().id}}</li>
+                <li v-for="(frame, index) in stack.slice().reverse()" class="list-group-item" :class="{ 'list-group-item-primary': index === 0 }">{{frame.data().data}}</li>
             </ul>
         </div>
 
@@ -103,6 +103,8 @@
     <script src="https://unpkg.com/layout-base@2.0.1/layout-base.js"></script>
     <script src="https://unpkg.com/cose-base@2.1.0/cose-base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-fcose@2.1.0/cytoscape-fcose.min.js"></script>
+
+    <script src="https://unpkg.com/vue@3.2.37"></script>
 
     <script type="module" src="index.js"></script>
 
