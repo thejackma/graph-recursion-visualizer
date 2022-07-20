@@ -2,6 +2,7 @@ import * as Vue from 'https://unpkg.com/vue@3.2.37/dist/vue.esm-browser.js';
 import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.33/+esm';
 import { examplePaths, defaultExample, fetchExample } from './js/example.js'
 import { initGrid } from './js/grid.js';
+import { names, layouts, defaultLayout, cy, eh } from './js/graph.js';
 
 async function main() {
     initGrid();
@@ -11,156 +12,6 @@ async function main() {
         language: 'javascript',
         automaticLayout: true,
     });
-
-    let id = 0;
-
-    const layouts = {
-        'Concentric': {
-            name: 'concentric',
-            concentric: (n) => { 0; },
-            levelWidth: (nodes) => { return 100; },
-            minNodeSpacing: 100,
-        },
-        'Dagre': {
-            name: 'dagre',
-        },
-        'fCoSE': {
-            name: 'fcose',
-        },
-        'Klay': {
-            name: 'klay',
-        },
-        'Random': {
-            name: 'random',
-        },
-    };
-    const defaultLayout = 'Dagre';
-
-    const cy = cytoscape({
-        container: document.getElementById('graph'),
-
-        layout: layouts[defaultLayout],
-
-        style: [
-            {
-                selector: 'node',
-                style: {
-                    'label': 'data(id)',
-                },
-            },
-            {
-                selector: 'edge',
-                style: {
-                    'curve-style': 'bezier',
-                    'target-arrow-shape': 'triangle',
-                },
-            },
-            {
-                selector: '.eh-handle',
-                style: {
-                    'background-color': 'red',
-                    'width': 12,
-                    'height': 12,
-                    'shape': 'ellipse',
-                    'overlay-opacity': 0,
-                    'border-width': 12, // makes the handle easier to hit
-                    'border-opacity': 0,
-                },
-            },
-            {
-                selector: '.eh-hover',
-                style: {
-                    'background-color': 'red',
-                },
-            },
-            {
-                selector: '.eh-source',
-                style: {
-                    'border-width': 2,
-                    'border-color': 'red',
-                },
-            },
-            {
-                selector: '.eh-target',
-                style: {
-                    'border-width': 2,
-                    'border-color': 'red',
-                },
-            },
-            {
-                selector: '.eh-preview, .eh-ghost-edge',
-                style: {
-                    'background-color': 'red',
-                    'line-color': 'red',
-                    'target-arrow-color': 'red',
-                    'source-arrow-color': 'red',
-                },
-            },
-            {
-                selector: '.eh-ghost-edge.eh-preview-active',
-                style: {
-                    'opacity': 0,
-                },
-            },
-            {
-                selector: 'node, edge',
-                style: {
-                    'transition-property': 'background-color, line-color, target-arrow-color',
-                    'transition-duration': '0.25s',
-                },
-            },
-            {
-                selector: '.highlighted',
-                style: {
-                    'background-color': '#61bffc',
-                    'line-color': '#61bffc',
-                    'target-arrow-color': '#61bffc',
-                },
-            },
-        ],
-
-        elements: {
-            nodes: [
-                { data: { id: 'Adam' } },
-                { data: { id: 'Barry' } },
-                { data: { id: 'Charles' } },
-                { data: { id: 'Danny' } },
-                { data: { id: 'Evan' } },
-                { data: { id: 'Felix' } },
-                { data: { id: 'George' } },
-                { data: { id: 'Harry' } },
-            ],
-            edges: [
-                { data: { source: 'Adam', target: 'Barry' } },
-                { data: { source: 'Adam', target: 'Charles' } },
-                { data: { source: 'Barry', target: 'Charles' } },
-                { data: { source: 'Barry', target: 'Danny' } },
-                { data: { source: 'Danny', target: 'Evan' } },
-                { data: { source: 'Evan', target: 'Felix' } },
-                { data: { source: 'Felix', target: 'George' } },
-                { data: { source: 'Barry', target: 'Harry' } },
-            ],
-        },
-    });
-
-    const defaults = {
-        canConnect(sourceNode, targetNode) {
-            return true;
-        },
-        edgeParams(sourceNode, targetNode) {
-            // for edges between the specified source and target
-            // return element object to be passed to cy.add() for edge
-            return {};
-        },
-        hoverDelay: 0, // time spent hovering over a target node before it is considered selected
-        snap: false, // when enabled, the edge can be drawn by just moving close to a target node (can be confusing on compound graphs)
-        noEdgeEventsInDraw: true, // set events:no to edges during draws, prevents mouseouts on compounds
-        disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
-    };
-
-    const eh = cy.edgehandles(defaults);
-
-    eh.enableDrawMode();
 
     const graphControls = Vue.createApp({
         data() {
@@ -210,6 +61,12 @@ async function main() {
         },
     }).mount('#graph-controls');
 
+    const remainingNames = new Set(names);
+    for (let node of cy.nodes()) {
+        remainingNames.delete(node.data().name);
+    }
+    let id = cy.nodes().length;
+
     cy.on('tap', (evt) => {
         if (!graphControls.clickToCreateNodeEnabled) {
             return;
@@ -220,8 +77,15 @@ async function main() {
             return;
         }
 
+        let name = remainingNames.values().next().value;
+        if (name) {
+            remainingNames.delete(name);
+        } else {
+            name = 'New';
+        }
+
         cy.add({
-            data: { id: ++id },
+            data: { id: ++id, name },
             position: {
                 x: evt.position.x,
                 y: evt.position.y,
@@ -231,6 +95,10 @@ async function main() {
 
     cy.on('cxttap', 'node', (evt) => {
         var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
+        const name = tgt.data().name;
+        if (names.has(name)) {
+            remainingNames.add(name);
+        }
         tgt.remove();
     });
 
