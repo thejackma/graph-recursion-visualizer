@@ -231,7 +231,7 @@ async function main() {
                 this.enabled = true;
                 this.drawMode = this.previousDrawMode;
                 this.clickToCreateNodeEnabled = this.previousClickToCreateNodeEnabled;
-            }
+            },
         },
     }).mount('#graph-controls');
 
@@ -318,7 +318,7 @@ async function main() {
                 } else {
                     return 0;
                 }
-            }
+            },
         },
         methods: {
             playOrPause() {

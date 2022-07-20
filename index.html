@@ -33,8 +33,8 @@
                     <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuExamples" data-bs-toggle="dropdown" aria-expanded="false">
                         Examples
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuExamples">
-                        <li><a v-for="exampleName in exampleNames" class="dropdown-item" href="#" @click="applyExample(exampleName)">{{exampleName}}</a></li>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuExamples" :disabled="operations">
+                        <li><a v-for="exampleName in exampleNames" class="dropdown-item" :class="{ 'disabled': operations }" href="#" @click="applyExample(exampleName)">{{exampleName}}</a></li>
                     </ul>
                 </span>
             </div>
