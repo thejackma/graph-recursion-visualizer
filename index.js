@@ -2,7 +2,7 @@ import * as Vue from 'https://unpkg.com/vue@3.2.37/dist/vue.esm-browser.js';
 import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.33/+esm';
 import { examplePaths, defaultExample, fetchExample } from './js/example.js'
 import { initGrid } from './js/grid.js';
-import { names, layouts, defaultLayout, cy, eh } from './js/graph.js';
+import { layouts, defaultLayout, cy, eh, setNewNodesEnabled } from './js/graph.js';
 
 async function main() {
     initGrid();
@@ -19,11 +19,22 @@ async function main() {
                 enabled: true,
                 drawMode: 'Connect',
                 previousDrawMode: null,
-                clickToCreateNodeEnabled: true,
-                previousClickToCreateNodeEnabled: null,
+                newNodesEnabled: true,
+                previousNewNodesEnabled: null,
                 layoutNames: Object.keys(layouts),
                 selectedLayoutName: defaultLayout,
             };
+        },
+        computed: {
+            computedNewNodesEnabled: {
+                get() {
+                    return this.newNodesEnabled;
+                },
+                set(value) {
+                    this.newNodesEnabled = value;
+                    setNewNodesEnabled(value);
+                },
+            },
         },
         methods: {
             toggleDrawMode() {
@@ -47,8 +58,8 @@ async function main() {
                 this.enabled = false;
                 this.previousDrawMode = this.drawMode;
                 this.drawMode = 'Move';
-                this.previousClickToCreateNodeEnabled = this.clickToCreateNodeEnabled;
-                this.clickToCreateNodeEnabled = false;
+                this.previousNewNodesEnabled = this.newNodesEnabled;
+                this.newNodesEnabled = false;
             },
             enable() {
                 if (this.enabled) {
@@ -56,68 +67,10 @@ async function main() {
                 }
                 this.enabled = true;
                 this.drawMode = this.previousDrawMode;
-                this.clickToCreateNodeEnabled = this.previousClickToCreateNodeEnabled;
+                this.newNodesEnabled = this.previousNewNodesEnabled;
             },
         },
     }).mount('#graph-controls');
-
-    const remainingNames = new Set(names);
-    for (let node of cy.nodes()) {
-        remainingNames.delete(node.data().data);
-    }
-    let id = cy.nodes().length;
-
-    cy.on('tap', (evt) => {
-        if (!graphControls.clickToCreateNodeEnabled) {
-            return;
-        }
-
-        var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-        if (tgt !== cy) {
-            return;
-        }
-
-        let name = remainingNames.values().next().value;
-        if (name) {
-            remainingNames.delete(name);
-        } else {
-            name = 'New';
-        }
-
-        cy.add({
-            data: { id: ++id, data: name },
-            position: {
-                x: evt.position.x,
-                y: evt.position.y,
-            },
-        });
-    });
-
-    cy.on('dbltap', 'node', (evt) => {
-        var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-        const data = prompt('Node data', tgt.data().data);
-        tgt.data('data', data);
-    });
-
-    cy.on('dbltap', 'edge', (evt) => {
-        var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-        const data = prompt('Edge data', tgt.data().data);
-        tgt.data('data', data);
-    });
-
-    cy.on('cxttap', 'node', (evt) => {
-        var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-        const data = tgt.data().data;
-        if (names.has(data)) {
-            remainingNames.add(data);
-        }
-        tgt.remove();
-    });
-
-    cy.on('cxttap', 'edge', (evt) => {
-        var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-        tgt.remove();
-    });
 
     const stack = Vue.createApp({
         data() {

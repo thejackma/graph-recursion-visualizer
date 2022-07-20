@@ -1,4 +1,4 @@
-export const names = new Set([
+const names = [
     'Adam',
     'Beth',
     'Charles',
@@ -25,7 +25,7 @@ export const names = new Set([
     'Xavia',
     'Yuri',
     'Zoey',
-]);
+];
 
 export const layouts = {
     'Concentric': {
@@ -48,8 +48,6 @@ export const layouts = {
     },
 };
 export const defaultLayout = 'Dagre';
-
-let id = 0;
 
 export const cy = cytoscape({
     container: document.getElementById('graph'),
@@ -136,24 +134,24 @@ export const cy = cytoscape({
 
     elements: {
         nodes: [
-            { data: { id: ++id, data: 'Adam' } },
-            { data: { id: ++id, data: 'Beth' } },
-            { data: { id: ++id, data: 'Charles' } },
-            { data: { id: ++id, data: 'Dabby' } },
-            { data: { id: ++id, data: 'Evans' } },
-            { data: { id: ++id, data: 'Fiona' } },
-            { data: { id: ++id, data: 'George' } },
-            { data: { id: ++id, data: 'Helen' } },
+            { data: { id: 0, data: names[0] } },
+            { data: { id: 1, data: names[1] } },
+            { data: { id: 2, data: names[2] } },
+            { data: { id: 3, data: names[3] } },
+            { data: { id: 4, data: names[4] } },
+            { data: { id: 5, data: names[5] } },
+            { data: { id: 6, data: names[6] } },
+            { data: { id: 7, data: names[7] } },
         ],
         edges: [
+            { data: { source: 0, target: 1 } },
+            { data: { source: 0, target: 2 } },
             { data: { source: 1, target: 2 } },
             { data: { source: 1, target: 3 } },
-            { data: { source: 2, target: 3 } },
-            { data: { source: 2, target: 4 } },
+            { data: { source: 3, target: 4 } },
             { data: { source: 4, target: 5 } },
             { data: { source: 5, target: 6 } },
-            { data: { source: 6, target: 7 } },
-            { data: { source: 2, target: 8 } },
+            { data: { source: 1, target: 7 } },
         ],
     },
 });
@@ -174,3 +172,68 @@ export const eh = cy.edgehandles({
 });
 
 eh.enableDrawMode();
+
+const nameSet = new Set(names);
+const remainingNames = new Set(names);
+let id = cy.nodes().length;
+let newNodesEnabled = true;
+
+for (let node of cy.nodes()) {
+    remainingNames.delete(node.data().data);
+}
+
+export function setNewNodesEnabled(value) {
+    newNodesEnabled = value;
+}
+
+cy.on('tap', (evt) => {
+    if (!newNodesEnabled) {
+        return;
+    }
+
+    var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
+    if (tgt !== cy) {
+        return;
+    }
+
+    let name = remainingNames.values().next().value;
+    if (name) {
+        remainingNames.delete(name);
+    } else {
+        name = 'New';
+    }
+
+    cy.add({
+        data: { id: id++, data: name },
+        position: {
+            x: evt.position.x,
+            y: evt.position.y,
+        },
+    });
+});
+
+cy.on('dbltap', 'node', (evt) => {
+    var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
+    const data = prompt('Node data', tgt.data().data);
+    tgt.data('data', data);
+});
+
+cy.on('dbltap', 'edge', (evt) => {
+    var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
+    const data = prompt('Edge data', tgt.data().data);
+    tgt.data('data', data);
+});
+
+cy.on('cxttap', 'node', (evt) => {
+    var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
+    const data = tgt.data().data;
+    if (nameSet.has(data)) {
+        remainingNames.add(data);
+    }
+    tgt.remove();
+});
+
+cy.on('cxttap', 'edge', (evt) => {
+    var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
+    tgt.remove();
+});
