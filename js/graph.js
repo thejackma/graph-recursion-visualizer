@@ -58,9 +58,9 @@ export const cy = cytoscape({
 
     style: [
         {
-            selector: 'node[name]',
+            selector: 'node[data], edge[data]',
             style: {
-                'label': 'data(name)',
+                'label': 'data(data)',
             },
         },
         {
@@ -136,14 +136,14 @@ export const cy = cytoscape({
 
     elements: {
         nodes: [
-            { data: { id: ++id, name: 'Adam' } },
-            { data: { id: ++id, name: 'Beth' } },
-            { data: { id: ++id, name: 'Charles' } },
-            { data: { id: ++id, name: 'Dabby' } },
-            { data: { id: ++id, name: 'Evans' } },
-            { data: { id: ++id, name: 'Fiona' } },
-            { data: { id: ++id, name: 'George' } },
-            { data: { id: ++id, name: 'Helen' } },
+            { data: { id: ++id, data: 'Adam' } },
+            { data: { id: ++id, data: 'Beth' } },
+            { data: { id: ++id, data: 'Charles' } },
+            { data: { id: ++id, data: 'Dabby' } },
+            { data: { id: ++id, data: 'Evans' } },
+            { data: { id: ++id, data: 'Fiona' } },
+            { data: { id: ++id, data: 'George' } },
+            { data: { id: ++id, data: 'Helen' } },
         ],
         edges: [
             { data: { source: 1, target: 2 } },
@@ -158,7 +158,7 @@ export const cy = cytoscape({
     },
 });
 
-const defaults = {
+export const eh = cy.edgehandles({
     canConnect(sourceNode, targetNode) {
         return true;
     },
@@ -171,8 +171,6 @@ const defaults = {
     snap: false, // when enabled, the edge can be drawn by just moving close to a target node (can be confusing on compound graphs)
     noEdgeEventsInDraw: true, // set events:no to edges during draws, prevents mouseouts on compounds
     disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
-};
-
-export const eh = cy.edgehandles(defaults);
+});
 
 eh.enableDrawMode();

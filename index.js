@@ -63,7 +63,7 @@ async function main() {
 
     const remainingNames = new Set(names);
     for (let node of cy.nodes()) {
-        remainingNames.delete(node.data().name);
+        remainingNames.delete(node.data().data);
     }
     let id = cy.nodes().length;
 
@@ -85,7 +85,7 @@ async function main() {
         }
 
         cy.add({
-            data: { id: ++id, name },
+            data: { id: ++id, data: name },
             position: {
                 x: evt.position.x,
                 y: evt.position.y,
@@ -93,11 +93,23 @@ async function main() {
         });
     });
 
+    cy.on('dbltap', 'node', (evt) => {
+        var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
+        const data = prompt('Node data', tgt.data().data);
+        tgt.data('data', data);
+    });
+
+    cy.on('dbltap', 'edge', (evt) => {
+        var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
+        const data = prompt('Edge data', tgt.data().data);
+        tgt.data('data', data);
+    });
+
     cy.on('cxttap', 'node', (evt) => {
         var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-        const name = tgt.data().name;
-        if (names.has(name)) {
-            remainingNames.add(name);
+        const data = tgt.data().data;
+        if (names.has(data)) {
+            remainingNames.add(data);
         }
         tgt.remove();
     });
