@@ -1,4 +1,4 @@
-import { examplePaths, fetchExample } from './example.js'
+import { codeExamplePaths, fetchCodeExample } from './code-example.js'
 
 export function initExecutionControls(cy, graphControls, editor, stack) {
     return Vue.createApp({
@@ -8,7 +8,7 @@ export function initExecutionControls(cy, graphControls, editor, stack) {
                 stack: [],
                 index: -1,
                 playIntervalId: 0,
-                exampleNames: Object.keys(examplePaths),
+                codeExamples: Object.keys(codeExamplePaths),
             };
         },
         computed: {
@@ -161,8 +161,8 @@ export function initExecutionControls(cy, graphControls, editor, stack) {
                 const func = new Function('__dfsNodes', code);
                 this.operations = func(cy.nodes());
             },
-            async applyExample(exampleName) {
-                const example = await fetchExample(exampleName);
+            async applyCodeExample(exampleName) {
+                const example = await fetchCodeExample(exampleName);
                 editor.setValue(example);
             },
         },
