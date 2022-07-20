@@ -1,7 +1,6 @@
 export const codeExamplePaths = {
     'Basic': 'code-examples/basic.js',
     'Cycle Detection': 'code-examples/cycle-detection.js',
-    'Dijkstra': 'code-examples/dijkstra.js',
 };
 
 export const defaultCodeExample = 'Basic';

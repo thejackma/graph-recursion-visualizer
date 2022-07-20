@@ -207,6 +207,7 @@ export const graphControls = Vue.createApp({
             this.enabled = false;
             this.previousDrawMode = this.drawMode;
             this.drawMode = 'Move';
+            eh.disableDrawMode();
             this.previousNewNodesEnabled = this.newNodesEnabled;
             this.newNodesEnabled = false;
         },
