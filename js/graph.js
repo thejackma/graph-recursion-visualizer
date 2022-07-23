@@ -171,28 +171,39 @@ const eh = cy.edgehandles({
     disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
 });
 
-eh.enableDrawMode();
-
 export const graphControls = Vue.createApp({
     data() {
+        eh.enableDrawMode();
+
         return {
             enabled: true,
-            drawMode: 'Connect',
-            previousDrawMode: null,
+            connectEnabledValue: true,
+            previousConnectEnabled: null,
             newNodesEnabled: true,
             previousNewNodesEnabled: null,
             layoutNames: Object.keys(layouts),
             selectedLayoutName: defaultLayout,
         };
     },
-    methods: {
-        toggleDrawMode() {
-            if (this.drawMode === 'Connect') {
-                eh.enableDrawMode();
-            } else {
-                eh.disableDrawMode();
-            }
+    computed: {
+        connectEnabled: {
+            get() {
+                return this.connectEnabledValue;
+            },
+            set(value) {
+                this.connectEnabledValue = value;
+                if (value) {
+                    eh.enableDrawMode();
+                } else {
+                    eh.disableDrawMode();
+                }
+            },
         },
+        drawMode() {
+            return this.connectEnabled ? 'Connect' : 'Move';
+        },
+    },
+    methods: {
         applyLayout() {
             cy.layout(layouts[this.selectedLayoutName]).run();
         },
@@ -205,9 +216,8 @@ export const graphControls = Vue.createApp({
                 return;
             }
             this.enabled = false;
-            this.previousDrawMode = this.drawMode;
-            this.drawMode = 'Move';
-            eh.disableDrawMode();
+            this.previousConnectEnabled = this.connectEnabled;
+            this.connectEnabled = false;
             this.previousNewNodesEnabled = this.newNodesEnabled;
             this.newNodesEnabled = false;
         },
@@ -216,7 +226,7 @@ export const graphControls = Vue.createApp({
                 return;
             }
             this.enabled = true;
-            this.drawMode = this.previousDrawMode;
+            this.connectEnabled = this.previousConnectEnabled;
             this.newNodesEnabled = this.previousNewNodesEnabled;
         },
     },
