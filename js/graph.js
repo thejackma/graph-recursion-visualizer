@@ -177,30 +177,21 @@ export const graphControls = Vue.createApp({
 
         return {
             enabled: true,
-            connectEnabledValue: true,
-            previousConnectEnabled: null,
+            drawMode: 'Connect',
+            drawModePrev: null,
             newNodesEnabled: true,
-            previousNewNodesEnabled: null,
+            newNodesEnabledPrev: null,
             layoutNames: Object.keys(layouts),
             selectedLayoutName: defaultLayout,
         };
     },
-    computed: {
-        connectEnabled: {
-            get() {
-                return this.connectEnabledValue;
-            },
-            set(value) {
-                this.connectEnabledValue = value;
-                if (value) {
-                    eh.enableDrawMode();
-                } else {
-                    eh.disableDrawMode();
-                }
-            },
-        },
-        drawMode() {
-            return this.connectEnabled ? 'Connect' : 'Move';
+    watch: {
+        drawMode(newValue, oldValue) {
+            if (newValue === 'Connect') {
+                eh.enableDrawMode();
+            } else {
+                eh.disableDrawMode();
+            }
         },
     },
     methods: {
@@ -216,9 +207,9 @@ export const graphControls = Vue.createApp({
                 return;
             }
             this.enabled = false;
-            this.previousConnectEnabled = this.connectEnabled;
-            this.connectEnabled = false;
-            this.previousNewNodesEnabled = this.newNodesEnabled;
+            this.drawModePrev = this.drawMode;
+            this.drawMode = 'Move';
+            this.newNodesEnabledPrev = this.newNodesEnabled;
             this.newNodesEnabled = false;
         },
         enable() {
@@ -226,8 +217,8 @@ export const graphControls = Vue.createApp({
                 return;
             }
             this.enabled = true;
-            this.connectEnabled = this.previousConnectEnabled;
-            this.newNodesEnabled = this.previousNewNodesEnabled;
+            this.drawMode = this.drawModePrev;
+            this.newNodesEnabled = this.newNodesEnabledPrev;
         },
     },
 }).mount('#graph-controls');

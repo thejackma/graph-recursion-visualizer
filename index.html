@@ -50,10 +50,10 @@
         <div id="graph-controls" class="cell mx-1 my-3">
             <div>
                 <span class="btn-group m-2" role="group">
-                    <input type="radio" class="btn-check" name="btnMode" id="btnConnect" autocomplete="off" value="Connect" v-model="drawMode" @change="connectEnabled = true" :disabled="!enabled">
+                    <input type="radio" class="btn-check" name="btnMode" id="btnConnect" autocomplete="off" value="Connect" v-model="drawMode" :disabled="!enabled">
                     <label class="btn btn-outline-primary" for="btnConnect">Connect</label>
 
-                    <input type="radio" class="btn-check" name="btnMode" id="btnMove" autocomplete="off" value="Move" v-model="drawMode" @change="connectEnabled = false">
+                    <input type="radio" class="btn-check" name="btnMode" id="btnMove" autocomplete="off" value="Move" v-model="drawMode">
                     <label class="btn btn-outline-primary" for="btnMove">Move</label>
                 </span>
 
