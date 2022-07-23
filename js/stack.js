@@ -4,8 +4,6 @@ export const stack = Vue.createApp({
             stack: [],
         };
     },
-    computed: {
-    },
     methods: {
         reset() {
             this.stack = [];

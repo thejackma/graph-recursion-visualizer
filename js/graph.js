@@ -183,6 +183,7 @@ export const graphControls = Vue.createApp({
             newNodesEnabledPrev: null,
             layoutNames: Object.keys(layouts),
             selectedLayoutName: defaultLayout,
+            directed: true,
         };
     },
     watch: {
@@ -192,6 +193,12 @@ export const graphControls = Vue.createApp({
             } else {
                 eh.disableDrawMode();
             }
+        },
+        directed(newValue, oldValue) {
+            const shape = newValue ? 'triangle' : 'none';
+            cy.style().selector('edge').style({
+                'target-arrow-shape': shape,
+            }).update();
         },
     },
     methods: {
