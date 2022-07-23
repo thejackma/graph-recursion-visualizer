@@ -5,7 +5,7 @@
     grid-template-columns: 1fr 10px 1fr 10px 1fr;
     grid-template-rows: auto 1fr;
     grid-template-areas:
-        "execution-controls  gutter-1  graph-controls  gutter-3  stack"
+        "execution-controls  gutter-1  graph-controls  gutter-3  stack-controls"
         "editor              gutter-1  graph           gutter-3  stack"
 }
 
@@ -45,20 +45,29 @@
     grid-area: editor;
 }
 
+#stack-controls {
+    grid-area: stack-controls;
+}
+
 #stack {
     grid-area: stack;
-    overflow: scroll;
+}
+
+#stack-grid {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto 1fr;
     grid-template-areas:
-        "empty"
         "frames"
+        "empty"
 }
 
-#empty {
-    grid-area: empty;
-}
-
-#frames {
+#stack-frames {
     grid-area: frames;
+}
+
+#stack-empty {
+    grid-area: empty;
 }

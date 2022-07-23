@@ -50,10 +50,10 @@
         <div id="graph-controls" class="cell mx-1 my-3">
             <div>
                 <span class="btn-group m-2" role="group">
-                    <input type="radio" class="btn-check" name="btnMode" id="btnConnect" autocomplete="off" value="Connect" v-model="drawMode" :disabled="!enabled">
+                    <input type="radio" class="btn-check" name="btnDrawMode" id="btnConnect" autocomplete="off" value="Connect" v-model="drawMode" :disabled="!enabled">
                     <label class="btn btn-outline-primary" for="btnConnect">Connect</label>
 
-                    <input type="radio" class="btn-check" name="btnMode" id="btnMove" autocomplete="off" value="Move" v-model="drawMode">
+                    <input type="radio" class="btn-check" name="btnDrawMode" id="btnMove" autocomplete="off" value="Move" v-model="drawMode">
                     <label class="btn btn-outline-primary" for="btnMove">Move</label>
                 </span>
 
@@ -81,13 +81,25 @@
             </div>
         </div>
 
-        <div id="graph" class="cell"> </div>
+        <div id="graph" class="cell"></div>
 
-        <div id="stack" class="cell">
-            <div id="empty"></div>
-            <ul id="frames" class="list-group">
-                <li v-for="(frame, index) in stack.slice().reverse()" class="list-group-item" :class="{ 'list-group-item-primary': index === 0 }">{{frame.data().data}}</li>
-            </ul>
+        <div id="stack-controls" class="mx-1 my-3">
+            <span class="btn-group m-2" role="group">
+                <input type="radio" class="btn-check" name="btnStackMode" id="btnTopDown" autocomplete="off" value="TopDown" v-model="stackMode">
+                <label class="btn btn-outline-primary" for="btnTopDown">Top-Down</label>
+
+                <input type="radio" class="btn-check" name="btnStackMode" id="btnBottomUp" autocomplete="off" value="BottomUp" v-model="stackMode">
+                <label class="btn btn-outline-primary" for="btnBottomUp">Bottom-Up</label>
+            </span>
+        </div>
+
+        <div id="stack">
+            <div id="stack-grid" :style="stackGrid">
+                <ul id="stack-frames" class="list-group">
+                    <li v-for="(frame, index) in stackView" class="list-group-item" :class="{ 'list-group-item-primary': index === stackTopIndex }">{{frame.data().data}}</li>
+                </ul>
+                <div id="stack-empty"></div>
+            </div>
         </div>
 
         <div class="gutter-col gutter-col-1"></div>
