@@ -6,7 +6,7 @@ export const graphSource = monaco.editor.create(document.getElementById('graph-s
     automaticLayout: true,
 });
 
-export function initGraphSourceControls(cy, graphControls) {
+export function initGraphSourceControls(graphControls) {
     return Vue.createApp({
         data() {
             return {
@@ -33,43 +33,10 @@ export function initGraphSourceControls(cy, graphControls) {
                 document.querySelector('#graph-source').classList.remove('d-none');
             },
             save() {
-                this._showGraph(graphSource.getValue());
+                graphControls.deserialize(graphSource.getValue());
             },
             cancel() {
                 graphControls.viewSource = false;
-            },
-            _showGraph(source) {
-                const graph = graphlibDot.read(source);
-                const nodes = [];
-                const edges = [];
-
-                for (const node of graph.nodes()) {
-                    nodes.push({
-                        data: {
-                            id: node,
-                            data: graph.node(node),
-                        },
-                    });
-                }
-
-                for (const edge of graph.edges()) {
-                    edges.push({
-                        data: {
-                            source: edge.v,
-                            target: edge.w,
-                            data: graph.edge(edge.v, edge.w),
-                        },
-                    });
-                }
-
-                const elements = {
-                    nodes,
-                    edges,
-                };
-
-                cy.remove(cy.elements());
-                cy.add(elements);
-                graphControls.applyLayout();
             },
             hide() {
                 document.querySelector('#graph-source-controls').classList.add('d-none');

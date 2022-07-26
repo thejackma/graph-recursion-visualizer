@@ -9,7 +9,7 @@ import { graphSource, initGraphSourceControls } from './js/graph-source.js';
 async function main() {
     initGrid();
 
-    const graphSourceControls = initGraphSourceControls(cy, graphControls);
+    const graphSourceControls = initGraphSourceControls(graphControls);
     graphControls.setGraphSourceControls(graphSourceControls);
 
     initExecutionControls(cy, graphControls, graphSourceControls, editor, stack);

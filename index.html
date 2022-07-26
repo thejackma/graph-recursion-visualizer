@@ -108,7 +108,7 @@
             <div id="stack">
                 <div id="stack-grid" :style="stackGrid">
                     <ul id="stack-frames" class="list-group">
-                        <li v-for="(frame, index) in stackView" class="list-group-item" :class="{ 'list-group-item-primary': index === stackTopIndex }">{{frame.data().data}}</li>
+                        <li v-for="(frame, index) in stackView" class="list-group-item" :class="{ 'list-group-item-primary': index === stackTopIndex }">{{frame.data().label}}</li>
                     </ul>
                     <div id="stack-empty"></div>
                 </div>

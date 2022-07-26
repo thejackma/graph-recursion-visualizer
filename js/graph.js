@@ -49,6 +49,15 @@ const layouts = {
 };
 const defaultLayout = 'Dagre';
 
+function getLabel(data) {
+    if (!data) {
+        return null;
+    }
+    const name = data.hasOwnProperty('name') ? data.name : '';
+    const weight = data.hasOwnProperty('weight') ? `: ${data.weight}` : '';
+    return `${name}${weight}`;
+}
+
 export const cy = cytoscape({
     container: document.getElementById('graph'),
 
@@ -56,9 +65,9 @@ export const cy = cytoscape({
 
     style: [
         {
-            selector: 'node[data.label], edge[data.label]',
+            selector: 'node[label], edge[label]',
             style: {
-                'label': 'data(data.label)',
+                'label': 'data(label)',
             },
         },
         {
@@ -133,15 +142,19 @@ export const cy = cytoscape({
     ],
 
     elements: {
-        nodes: _.range(8).map(i => ({
-            data: {
-                id: i,
+        nodes: _.range(8).map(i => {
+            const data = {
+                name: names[i],
+                weight: i,
+            };
+            return {
                 data: {
-                    label: names[i],
-                    weight: i,
+                    id: i,
+                    data,
+                    label: getLabel(data),
                 },
-            },
-        })),
+            };
+        }),
         edges: [
             { data: { source: 0, target: 1 } },
             { data: { source: 0, target: 2 } },
@@ -169,6 +182,14 @@ const eh = cy.edgehandles({
     noEdgeEventsInDraw: true, // set events:no to edges during draws, prevents mouseouts on compounds
     disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
 });
+
+function safeParseInt(s) {
+    try {
+        return parseInt(s);
+    } catch (e) {
+        return s;
+    }
+}
 
 export const graphControls = Vue.createApp({
     data() {
@@ -208,16 +229,8 @@ export const graphControls = Vue.createApp({
         },
         viewSource(newValue, oldValue) {
             if (newValue) {
-                const digraph = new graphlib.Graph();
-
-                for (const node of cy.nodes()) {
-                    digraph.setNode(node.id(), node.data().data);
-                }
-                for (const edge of cy.edges()) {
-                    digraph.setEdge(edge.source().id(), edge.target().id(), edge.data().data);
-                }
-
-                this.graphSourceControls.show(graphlibDot.write(digraph));
+                const source = this.serialize();
+                this.graphSourceControls.show(source);
             } else {
                 this.graphSourceControls.hide();
             }
@@ -249,9 +262,70 @@ export const graphControls = Vue.createApp({
             this.drawMode = this.drawModePrev;
             this.newNodesEnabled = this.newNodesEnabledPrev;
         },
+        serialize() {
+            const digraph = new graphlib.Graph();
+
+            for (const node of cy.nodes()) {
+                const id = safeParseInt(node.id());
+                const data = node.data().data;
+                if (data && data.hasOwnProperty('weight')) {
+                    data.weight = safeParseInt(data.weight);
+                }
+                digraph.setNode(id, data);
+            }
+
+            for (const edge of cy.edges()) {
+                const source = safeParseInt(edge.source().id());
+                const target = safeParseInt(edge.target().id());
+                const data = edge.data().data;
+                if (data && data.hasOwnProperty('weight')) {
+                    data.weight = safeParseInt(data.weight);
+                }
+                digraph.setEdge(source, target, data);
+            }
+
+            return graphlibDot.write(digraph);
+        },
+        deserialize(source) {
+            const graph = graphlibDot.read(source);
+            const nodes = [];
+            const edges = [];
+
+            for (const id of graph.nodes()) {
+                const data = graph.node(id);
+                nodes.push({
+                    data: {
+                        id,
+                        data,
+                        label: getLabel(data),
+                    },
+                });
+            }
+
+            for (const edge of graph.edges()) {
+                const data = graph.edge(edge.v, edge.w);
+                edges.push({
+                    data: {
+                        source: edge.v,
+                        target: edge.w,
+                        data: data,
+                        label: getLabel(data),
+                    },
+                });
+            }
+
+            const elements = {
+                nodes,
+                edges,
+            };
+
+            cy.remove(cy.elements());
+            cy.add(elements);
+            this.applyLayout();
+        },
         setGraphSourceControls(value) {
             this.graphSourceControls = value;
-        }
+        },
     },
 }).mount('#graph-controls');
 
@@ -260,7 +334,7 @@ const remainingNames = new Set(names);
 let id = cy.nodes().length;
 
 for (let node of cy.nodes()) {
-    remainingNames.delete(node.data().data.label);
+    remainingNames.delete(node.data().data.name);
 }
 
 cy.on('tap', (evt) => {
@@ -281,7 +355,7 @@ cy.on('tap', (evt) => {
     }
 
     cy.add({
-        data: { id: id++, data: { label: name } },
+        data: { id: id++, data: { name: name } },
         position: {
             x: evt.position.x,
             y: evt.position.y,
@@ -303,12 +377,13 @@ function doubleTap(evt) {
     try {
         data = JSON.parse(dataStr);
         if (typeof data !== 'object') {
-            data = { label: dataStr };
+            data = { name: dataStr };
         }
     } catch (e) {
-        data = { label: dataStr };
+        data = { name: dataStr };
     }
     tgt.data('data', data);
+    tgt.data('label', getLabel(data));
 }
 
 cy.on('dbltap', 'node', doubleTap);
@@ -316,9 +391,9 @@ cy.on('dbltap', 'edge', doubleTap);
 
 cy.on('cxttap', 'node', (evt) => {
     var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-    const label = tgt.data().data.label;
-    if (nameSet.has(label)) {
-        remainingNames.add(label);
+    const name = tgt.data().data.name;
+    if (nameSet.has(name)) {
+        remainingNames.add(name);
     }
     tgt.remove();
 });
