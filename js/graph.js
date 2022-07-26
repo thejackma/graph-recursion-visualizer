@@ -49,6 +49,12 @@ const layouts = {
 };
 const defaultLayout = 'Dagre';
 
+const configKeyLayout = 'layout';
+let layout = localStorage.getItem(configKeyLayout);
+if (!layout || !layouts.hasOwnProperty(layout)) {
+    layout = defaultLayout;
+}
+
 function getLabel(data) {
     if (!data) {
         return null;
@@ -58,10 +64,107 @@ function getLabel(data) {
     return `${name}${weight}`;
 }
 
+const defaultElements = {
+    nodes: _.range(8).map(i => {
+        const data = {
+            name: names[i],
+            weight: i,
+        };
+        return {
+            data: {
+                id: i,
+                data,
+                label: getLabel(data),
+            },
+        };
+    }),
+    edges: [
+        { data: { source: 0, target: 1 } },
+        { data: { source: 0, target: 2 } },
+        { data: { source: 1, target: 2 } },
+        { data: { source: 1, target: 3 } },
+        { data: { source: 3, target: 4 } },
+        { data: { source: 4, target: 5 } },
+        { data: { source: 5, target: 6 } },
+        { data: { source: 1, target: 7 } },
+    ],
+};
+
+function serialize(cy) {
+    const digraph = new graphlib.Graph();
+
+    for (const node of cy.nodes()) {
+        const id = safeParseInt(node.id());
+        const data = node.data().data;
+        if (data && data.hasOwnProperty('weight')) {
+            data.weight = safeParseInt(data.weight);
+        }
+        digraph.setNode(id, data);
+    }
+
+    for (const edge of cy.edges()) {
+        const source = safeParseInt(edge.source().id());
+        const target = safeParseInt(edge.target().id());
+        const data = edge.data().data;
+        if (data && data.hasOwnProperty('weight')) {
+            data.weight = safeParseInt(data.weight);
+        }
+        digraph.setEdge(source, target, data);
+    }
+
+    return graphlibDot.write(digraph);
+}
+
+function deserialize(source) {
+    const graph = graphlibDot.read(source);
+    const nodes = [];
+    const edges = [];
+
+    for (const id of graph.nodes()) {
+        const data = graph.node(id);
+        nodes.push({
+            data: {
+                id,
+                data,
+                label: getLabel(data),
+            },
+        });
+    }
+
+    for (const edge of graph.edges()) {
+        const data = graph.edge(edge.v, edge.w);
+        edges.push({
+            data: {
+                source: edge.v,
+                target: edge.w,
+                data: data,
+                label: getLabel(data),
+            },
+        });
+    }
+
+    return {
+        nodes,
+        edges,
+    };
+}
+
+const configKeyGraph = 'graph';
+let elements = localStorage.getItem(configKeyGraph);
+if (elements) {
+    try {
+        elements = deserialize(elements);
+    } catch (e) {
+        elements = defaultElements;
+    }
+} else {
+    elements = defaultElements;
+}
+
 export const cy = cytoscape({
     container: document.getElementById('graph'),
 
-    layout: layouts[defaultLayout],
+    layout: layouts[layout],
 
     style: [
         {
@@ -141,31 +244,7 @@ export const cy = cytoscape({
         },
     ],
 
-    elements: {
-        nodes: _.range(8).map(i => {
-            const data = {
-                name: names[i],
-                weight: i,
-            };
-            return {
-                data: {
-                    id: i,
-                    data,
-                    label: getLabel(data),
-                },
-            };
-        }),
-        edges: [
-            { data: { source: 0, target: 1 } },
-            { data: { source: 0, target: 2 } },
-            { data: { source: 1, target: 2 } },
-            { data: { source: 1, target: 3 } },
-            { data: { source: 3, target: 4 } },
-            { data: { source: 4, target: 5 } },
-            { data: { source: 5, target: 6 } },
-            { data: { source: 1, target: 7 } },
-        ],
-    },
+    elements: elements,
 });
 
 const eh = cy.edgehandles({
@@ -202,7 +281,7 @@ export const graphControls = Vue.createApp({
             newNodesEnabled: true,
             newNodesEnabledPrev: null,
             layoutNames: Object.keys(layouts),
-            selectedLayoutName: defaultLayout,
+            selectedLayoutName: layout,
             directed: true,
             viewSource: false,
             graphSourceControls: null,
@@ -229,7 +308,7 @@ export const graphControls = Vue.createApp({
         },
         viewSource(newValue, oldValue) {
             if (newValue) {
-                const source = this.serialize();
+                const source = this.serialize(cy);
                 this.graphSourceControls.show(source);
             } else {
                 this.graphSourceControls.hide();
@@ -237,6 +316,9 @@ export const graphControls = Vue.createApp({
         },
     },
     methods: {
+        setGraphSourceControls(value) {
+            this.graphSourceControls = value;
+        },
         applyLayout() {
             cy.layout(layouts[this.selectedLayoutName]).run();
         },
@@ -262,69 +344,17 @@ export const graphControls = Vue.createApp({
             this.drawMode = this.drawModePrev;
             this.newNodesEnabled = this.newNodesEnabledPrev;
         },
-        serialize() {
-            const digraph = new graphlib.Graph();
+        showGraph(source) {
 
-            for (const node of cy.nodes()) {
-                const id = safeParseInt(node.id());
-                const data = node.data().data;
-                if (data && data.hasOwnProperty('weight')) {
-                    data.weight = safeParseInt(data.weight);
-                }
-                digraph.setNode(id, data);
-            }
-
-            for (const edge of cy.edges()) {
-                const source = safeParseInt(edge.source().id());
-                const target = safeParseInt(edge.target().id());
-                const data = edge.data().data;
-                if (data && data.hasOwnProperty('weight')) {
-                    data.weight = safeParseInt(data.weight);
-                }
-                digraph.setEdge(source, target, data);
-            }
-
-            return graphlibDot.write(digraph);
-        },
-        deserialize(source) {
-            const graph = graphlibDot.read(source);
-            const nodes = [];
-            const edges = [];
-
-            for (const id of graph.nodes()) {
-                const data = graph.node(id);
-                nodes.push({
-                    data: {
-                        id,
-                        data,
-                        label: getLabel(data),
-                    },
-                });
-            }
-
-            for (const edge of graph.edges()) {
-                const data = graph.edge(edge.v, edge.w);
-                edges.push({
-                    data: {
-                        source: edge.v,
-                        target: edge.w,
-                        data: data,
-                        label: getLabel(data),
-                    },
-                });
-            }
-
-            const elements = {
-                nodes,
-                edges,
-            };
 
             cy.remove(cy.elements());
             cy.add(elements);
             this.applyLayout();
         },
-        setGraphSourceControls(value) {
-            this.graphSourceControls = value;
+        reset() {
+            cy.remove(cy.elements());
+            cy.add(defaultElements);
+            this.applyLayout();
         },
     },
 }).mount('#graph-controls');
@@ -354,13 +384,24 @@ cy.on('tap', (evt) => {
         name = 'New';
     }
 
+    const data = {
+        name: name,
+        weight: id,
+    };
+
     cy.add({
-        data: { id: id++, data: { name: name } },
+        data: {
+            id,
+            data,
+            label: getLabel(data),
+        },
         position: {
             x: evt.position.x,
             y: evt.position.y,
         },
     });
+
+    id++;
 });
 
 function doubleTap(evt) {
@@ -401,4 +442,9 @@ cy.on('cxttap', 'node', (evt) => {
 cy.on('cxttap', 'edge', (evt) => {
     var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
     tgt.remove();
+});
+
+addEventListener('beforeunload', e => {
+    localStorage.setItem(configKeyGraph, serialize(cy));
+    localStorage.setItem(configKeyLayout, graphControls.selectedLayoutName);
 });

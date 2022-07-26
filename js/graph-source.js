@@ -33,7 +33,7 @@ export function initGraphSourceControls(graphControls) {
                 document.querySelector('#graph-source').classList.remove('d-none');
             },
             save() {
-                graphControls.deserialize(graphSource.getValue());
+                graphControls.showGraph(graphSource.getValue());
             },
             cancel() {
                 graphControls.viewSource = false;
