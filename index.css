@@ -5,8 +5,8 @@
     grid-template-columns: 1fr 10px 1fr 10px 1fr;
     grid-template-rows: auto 1fr;
     grid-template-areas:
-        "execution-controls  gutter-1  graph-controls  gutter-3  stack-controls"
-        "editor              gutter-1  graph           gutter-3  stack"
+        "execution-controls  gutter-1  graph-controls  gutter-3  stack-and-graph-controls"
+        "editor              gutter-1  graph           gutter-3  stack-and-graph-source"
 }
 
 .gutter-col {
@@ -45,12 +45,17 @@
     grid-area: editor;
 }
 
-#stack-controls {
-    grid-area: stack-controls;
+#stack-and-graph-controls {
+    grid-area: stack-and-graph-controls;
+}
+
+#stack-and-graph-source {
+    grid-area: stack-and-graph-source;
 }
 
 #stack {
-    grid-area: stack;
+    width: 100%;
+    height: 100%;
 }
 
 #stack-grid {
@@ -70,4 +75,9 @@
 
 #stack-empty {
     grid-area: empty;
+}
+
+#graph-source {
+    width: 100%;
+    height: 100%;
 }

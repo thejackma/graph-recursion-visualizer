@@ -56,9 +56,9 @@ export const cy = cytoscape({
 
     style: [
         {
-            selector: 'node[data], edge[data]',
+            selector: 'node[data.label], edge[data.label]',
             style: {
-                'label': 'data(data)',
+                'label': 'data(data.label)',
             },
         },
         {
@@ -133,16 +133,15 @@ export const cy = cytoscape({
     ],
 
     elements: {
-        nodes: [
-            { data: { id: 0, data: names[0] } },
-            { data: { id: 1, data: names[1] } },
-            { data: { id: 2, data: names[2] } },
-            { data: { id: 3, data: names[3] } },
-            { data: { id: 4, data: names[4] } },
-            { data: { id: 5, data: names[5] } },
-            { data: { id: 6, data: names[6] } },
-            { data: { id: 7, data: names[7] } },
-        ],
+        nodes: _.range(8).map(i => ({
+            data: {
+                id: i,
+                data: {
+                    label: names[i],
+                    weight: i,
+                },
+            },
+        })),
         edges: [
             { data: { source: 0, target: 1 } },
             { data: { source: 0, target: 2 } },
@@ -184,7 +183,14 @@ export const graphControls = Vue.createApp({
             layoutNames: Object.keys(layouts),
             selectedLayoutName: defaultLayout,
             directed: true,
+            viewSource: false,
+            graphSourceControls: null,
         };
+    },
+    computed: {
+        disabled() {
+            return !this.enabled;
+        },
     },
     watch: {
         drawMode(newValue, oldValue) {
@@ -199,6 +205,22 @@ export const graphControls = Vue.createApp({
             cy.style().selector('edge').style({
                 'target-arrow-shape': shape,
             }).update();
+        },
+        viewSource(newValue, oldValue) {
+            if (newValue) {
+                const digraph = new graphlib.Graph();
+
+                for (const node of cy.nodes()) {
+                    digraph.setNode(node.id(), node.data().data);
+                }
+                for (const edge of cy.edges()) {
+                    digraph.setEdge(edge.source().id(), edge.target().id(), edge.data().data);
+                }
+
+                this.graphSourceControls.show(graphlibDot.write(digraph));
+            } else {
+                this.graphSourceControls.hide();
+            }
         },
     },
     methods: {
@@ -227,6 +249,9 @@ export const graphControls = Vue.createApp({
             this.drawMode = this.drawModePrev;
             this.newNodesEnabled = this.newNodesEnabledPrev;
         },
+        setGraphSourceControls(value) {
+            this.graphSourceControls = value;
+        }
     },
 }).mount('#graph-controls');
 
@@ -235,7 +260,7 @@ const remainingNames = new Set(names);
 let id = cy.nodes().length;
 
 for (let node of cy.nodes()) {
-    remainingNames.delete(node.data().data);
+    remainingNames.delete(node.data().data.label);
 }
 
 cy.on('tap', (evt) => {
@@ -256,7 +281,7 @@ cy.on('tap', (evt) => {
     }
 
     cy.add({
-        data: { id: id++, data: name },
+        data: { id: id++, data: { label: name } },
         position: {
             x: evt.position.x,
             y: evt.position.y,
@@ -264,23 +289,36 @@ cy.on('tap', (evt) => {
     });
 });
 
-cy.on('dbltap', 'node', (evt) => {
-    var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-    const data = prompt('Node data', tgt.data().data);
-    tgt.data('data', data);
-});
+function doubleTap(evt) {
+    if (graphControls.disabled) {
+        return;
+    }
 
-cy.on('dbltap', 'edge', (evt) => {
     var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-    const data = prompt('Edge data', tgt.data().data);
+    const dataStr = prompt('Data', JSON.stringify(tgt.data().data));
+    if (dataStr == null) {
+        return;
+    }
+    let data;
+    try {
+        data = JSON.parse(dataStr);
+        if (typeof data !== 'object') {
+            data = { label: dataStr };
+        }
+    } catch (e) {
+        data = { label: dataStr };
+    }
     tgt.data('data', data);
-});
+}
+
+cy.on('dbltap', 'node', doubleTap);
+cy.on('dbltap', 'edge', doubleTap);
 
 cy.on('cxttap', 'node', (evt) => {
     var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-    const data = tgt.data().data;
-    if (nameSet.has(data)) {
-        remainingNames.add(data);
+    const label = tgt.data().data.label;
+    if (nameSet.has(label)) {
+        remainingNames.add(label);
     }
     tgt.remove();
 });

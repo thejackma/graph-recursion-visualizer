@@ -1,6 +1,6 @@
 import { codeExamplePaths, fetchCodeExample } from './code-example.js'
 
-export function initExecutionControls(cy, graphControls, editor, stack) {
+export function initExecutionControls(cy, graphControls, graphSourceControls, editor, stack) {
     return Vue.createApp({
         data() {
             return {
@@ -61,6 +61,7 @@ export function initExecutionControls(cy, graphControls, editor, stack) {
                     stack.reset();
                     editor.updateOptions({ readOnly: false });
                     graphControls.enable();
+                    graphSourceControls.enable();
                 }
             },
             replay() {
@@ -123,6 +124,7 @@ export function initExecutionControls(cy, graphControls, editor, stack) {
 
                 editor.updateOptions({ readOnly: true });
                 graphControls.disable();
+                graphSourceControls.disable();
 
                 const enter = `
                 __dfsOperations.push({

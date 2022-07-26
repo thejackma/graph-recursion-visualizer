@@ -50,7 +50,7 @@
         <div id="graph-controls" class="cell mx-1 my-3">
             <div>
                 <span class="btn-group m-2" role="group">
-                    <input type="radio" class="btn-check" name="btnDrawMode" id="btnConnect" autocomplete="off" value="Connect" v-model="drawMode" :disabled="!enabled">
+                    <input type="radio" class="btn-check" name="btnDrawMode" id="btnConnect" autocomplete="off" value="Connect" v-model="drawMode" :disabled="disabled">
                     <label class="btn btn-outline-primary" for="btnConnect">Connect</label>
 
                     <input type="radio" class="btn-check" name="btnDrawMode" id="btnMove" autocomplete="off" value="Move" v-model="drawMode">
@@ -58,12 +58,12 @@
                 </span>
 
                 <span class="form-check form-check-inline form-switch m-2">
-                    <input class="form-check-input" type="checkbox" role="switch" id="newNodesEnabled" v-model="newNodesEnabled" :disabled="!enabled">
+                    <input class="form-check-input" type="checkbox" role="switch" id="newNodesEnabled" v-model="newNodesEnabled" :disabled="disabled">
                     <label class="form-check-label" for="newNodesEnabled">New Nodes</label>
                 </span>
 
                 <span class="form-check form-check-inline form-switch m-2">
-                    <input class="form-check-input" type="checkbox" role="switch" id="directed" v-model="directed" :disabled="!enabled">
+                    <input class="form-check-input" type="checkbox" role="switch" id="directed" v-model="directed" :disabled="disabled">
                     <label class="form-check-label" for="directed">Directed</label>
                 </span>
             </div>
@@ -78,28 +78,42 @@
                         <li><a v-for="layoutName in layoutNames" class="dropdown-item" href="#" @click="selectLayout(layoutName)">{{layoutName}}</a></li>
                     </ul>
                 </span>
+
+                <span class="form-check form-check-inline form-switch m-2">
+                    <input class="form-check-input" type="checkbox" role="switch" id="view-source" v-model="viewSource">
+                    <label class="form-check-label" for="view-source">View Source</label>
+                </span>
             </div>
         </div>
 
         <div id="graph" class="cell"></div>
 
-        <div id="stack-controls" class="mx-1 my-3">
-            <span class="btn-group m-2" role="group">
-                <input type="radio" class="btn-check" name="btnStackMode" id="btnTopDown" autocomplete="off" value="TopDown" v-model="stackMode">
-                <label class="btn btn-outline-primary" for="btnTopDown">Top-Down</label>
+        <div id="stack-and-graph-controls" class="mx-1 my-3">
+            <div id="stack-controls">
+                <span class="btn-group m-2" role="group">
+                    <input type="radio" class="btn-check" name="btnStackMode" id="btnTopDown" autocomplete="off" value="TopDown" v-model="stackMode">
+                    <label class="btn btn-outline-primary" for="btnTopDown">Top-Down</label>
 
-                <input type="radio" class="btn-check" name="btnStackMode" id="btnBottomUp" autocomplete="off" value="BottomUp" v-model="stackMode">
-                <label class="btn btn-outline-primary" for="btnBottomUp">Bottom-Up</label>
-            </span>
+                    <input type="radio" class="btn-check" name="btnStackMode" id="btnBottomUp" autocomplete="off" value="BottomUp" v-model="stackMode">
+                    <label class="btn btn-outline-primary" for="btnBottomUp">Bottom-Up</label>
+                </span>
+            </div>
+            <div id="graph-source-controls" class="d-none">
+                <button type="button" class="btn btn-primary m-2" @click="save" :disabled="disabled">&nbsp; Save &nbsp;</button>
+                <button type="button" class="btn btn-outline-primary m-2" @click="cancel">Cancel</button>
+            </div>
         </div>
 
-        <div id="stack">
-            <div id="stack-grid" :style="stackGrid">
-                <ul id="stack-frames" class="list-group">
-                    <li v-for="(frame, index) in stackView" class="list-group-item" :class="{ 'list-group-item-primary': index === stackTopIndex }">{{frame.data().data}}</li>
-                </ul>
-                <div id="stack-empty"></div>
+        <div id="stack-and-graph-source">
+            <div id="stack">
+                <div id="stack-grid" :style="stackGrid">
+                    <ul id="stack-frames" class="list-group">
+                        <li v-for="(frame, index) in stackView" class="list-group-item" :class="{ 'list-group-item-primary': index === stackTopIndex }">{{frame.data().data}}</li>
+                    </ul>
+                    <div id="stack-empty"></div>
+                </div>
             </div>
+            <div id="graph-source" class="d-none"></div>
         </div>
 
         <div class="gutter-col gutter-col-1"></div>
@@ -120,6 +134,9 @@
     <script src="https://unpkg.com/layout-base@2.0.1/layout-base.js"></script>
     <script src="https://unpkg.com/cose-base@2.1.0/cose-base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-fcose@2.1.0/cytoscape-fcose.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/graphlib@2.1.8/dist/graphlib.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphlib-dot@0.6.4/dist/graphlib-dot.js"></script>
 
     <script src="https://unpkg.com/vue@3.2.37"></script>
 
