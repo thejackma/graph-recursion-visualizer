@@ -35,6 +35,9 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
                     this._pause();
                 } else {
                     this._runUserFunction();
+                    if (!this.operations) {
+                        return;
+                    }
                     this._forwardOrPause();
                     this.playIntervalId = setInterval(() => this._forwardOrPause(), 500);
                 }
@@ -75,6 +78,9 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
             forward() {
                 this._pause();
                 this._runUserFunction();
+                if (!this.operations) {
+                    return;
+                }
                 this._forward();
             },
             _backward() {
@@ -122,46 +128,51 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
                     return;
                 }
 
-                editor.updateOptions({ readOnly: true });
-                graphControls.disable();
-                graphSourceControls.disable();
-
                 const enter = `
-                __dfsOperations.push({
-                    type: 'push',
-                    node,
-                });
-            `;
+                    __dfsOperations.push({
+                        type: 'push',
+                        node,
+                    });
+                `;
 
                 const exit = `
-                __dfsOperations.push({
-                    type: 'pop',
-                    node,
-                });
-            `
+                    __dfsOperations.push({
+                        type: 'pop',
+                        node,
+                    });
+                `;
 
                 const userCode = editor.getValue()
                     .replaceAll('// DFS:in', enter)
                     .replaceAll('// DFS:out', exit);
 
                 const code = `
-                function __dfsRun(nodes) {
-                    const __dfsOperations = [];
+                    function __dfsRun(nodes) {
+                        const __dfsOperations = [];
 
-                    function __dfsUserCode() {
-                        ${userCode}
+                        function __dfsUserCode() {
+                            ${userCode}
+                        }
+
+                        __dfsUserCode();
+
+                        return __dfsOperations;
                     }
 
-                    __dfsUserCode();
-
-                    return __dfsOperations;
-                }
-
-                return __dfsRun(__dfsNodes);
-            `;
+                    return __dfsRun(__dfsNodes);
+                `;
 
                 const func = new Function('__dfsNodes', code);
-                this.operations = func(cy.nodes());
+                try {
+                    this.operations = func(cy.nodes());
+                } catch (e) {
+                    alert(e);
+                    return;
+                }
+
+                editor.updateOptions({ readOnly: true });
+                graphControls.disable();
+                graphSourceControls.disable();
             },
             async applyCodeExample(exampleName) {
                 const example = await fetchCodeExample(exampleName);

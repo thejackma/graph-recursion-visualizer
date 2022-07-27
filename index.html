@@ -83,8 +83,6 @@
                     <input class="form-check-input" type="checkbox" role="switch" id="view-source" v-model="viewSource">
                     <label class="form-check-label" for="view-source">View Source</label>
                 </span>
-
-                <button type="button" class="btn btn-primary m-2" @click="reset" :disabled="disabled">Reset</button>
             </div>
         </div>
 
@@ -101,11 +99,16 @@
                 </span>
             </div>
             <div id="graph-source-controls" class="d-none">
-                <button type="button" class="btn btn-primary m-2" @click="save" :disabled="disabled">&nbsp; Save &nbsp;</button>
-                <button type="button" class="btn btn-outline-primary m-2" @click="cancel">Cancel</button>
-                <button type="button" class="btn btn-primary m-2" @click="upload">Upload</button>
-                <input type="file" id="formFile" class="d-none" @change="fileSelected">
-                <button type="button" class="btn btn-primary m-2" @click="download">Download</button>
+                <div>
+                    <button type="button" class="btn btn-primary m-2" @click="save" :disabled="disabled">&nbsp; Save &nbsp;</button>
+                    <button type="button" class="btn btn-outline-primary m-2" @click="cancel">Cancel</button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary m-2" @click="upload">Upload</button>
+                    <input type="file" id="formFile" class="d-none" @change="fileSelected">
+                    <button type="button" class="btn btn-primary m-2" @click="download">Download</button>
+                    <button type="button" class="btn btn-danger m-2" @click="reset" :disabled="disabled">Reset</button>
+                </div>
             </div>
         </div>
 

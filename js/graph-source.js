@@ -76,6 +76,9 @@ export function initGraphSourceControls(graphControls) {
                 a.remove();
                 window.URL.revokeObjectURL(url);
             },
+            reset() {
+                graphControls.reset();
+            },
         },
     }).mount('#graph-source-controls');
 }
