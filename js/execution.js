@@ -63,6 +63,7 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
                     this.operations = null;
                     stack.reset();
                     editor.updateOptions({ readOnly: false });
+                    document.getElementById('monaco-overlay').classList.add('d-none');
                     graphControls.enable();
                     graphSourceControls.enable();
                 }
@@ -171,6 +172,7 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
                 }
 
                 editor.updateOptions({ readOnly: true });
+                document.getElementById('monaco-overlay').classList.remove('d-none');
                 graphControls.disable();
                 graphSourceControls.disable();
             },

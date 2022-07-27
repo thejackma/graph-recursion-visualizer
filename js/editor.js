@@ -8,7 +8,7 @@ if (!code) {
     code = await fetchCodeExample(defaultCodeExample);
 }
 
-export const editor = monaco.editor.create(document.getElementById('editor'), {
+export const editor = monaco.editor.create(document.getElementById('monaco'), {
     value: code,
     language: 'javascript',
     automaticLayout: true,
