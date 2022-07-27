@@ -3,6 +3,7 @@ export const stack = Vue.createApp({
         return {
             stack: [],
             topDown: true,
+            stackControl: null,
         };
     },
     computed: {
@@ -33,12 +34,17 @@ export const stack = Vue.createApp({
     methods: {
         reset() {
             this.stack = [];
+            this.stackControls.show = false;
         },
         push(curr) {
             this.stack.push(curr);
+            this.stackControls.show = true;
         },
         pop() {
             this.stack.pop();
+            if (this.stack.length === 0) {
+                this.stackControls.show = false;
+            }
         },
         top() {
             if (this.stack.length > 0) {
@@ -53,6 +59,7 @@ export const stack = Vue.createApp({
 const stackControls = Vue.createApp({
     data() {
         return {
+            show: false,
             stackMode: stack.topDown ? 'TopDown' : 'BottomUp',
         };
     },
@@ -62,3 +69,5 @@ const stackControls = Vue.createApp({
         },
     },
 }).mount('#stack-controls');
+
+stack.stackControls = stackControls;
