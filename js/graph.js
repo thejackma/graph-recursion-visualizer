@@ -55,39 +55,60 @@ if (!layout || !layouts.hasOwnProperty(layout)) {
     layout = defaultLayout;
 }
 
-function getLabel(data) {
-    if (!data) {
-        return null;
-    }
-    const name = data.hasOwnProperty('name') ? data.name : '';
-    const weight = data.hasOwnProperty('weight') ? `: ${data.weight}` : '';
-    return `${name}${weight}`;
+function createNode(id, data) {
+    return {
+        data: {
+            id,
+            data,
+            get label() {
+                const data = this.data;
+                if (!data) {
+                    return null;
+                }
+                const name = data.name != null ? data.name : '';
+                const weight = data.weight != null ? `: ${data.weight}` : '';
+                return `[${this.id}] ${name}${weight}`;
+            },
+        },
+    };
 }
 
-const defaultElements = {
-    nodes: _.range(8).map(i => {
-        const data = {
+function createEdge(source, target, data) {
+    return {
+        data: {
+            source,
+            target,
+            data,
+            get label() {
+                const data = this.data;
+                if (!data) {
+                    return null;
+                }
+                const name = data.name != null ? data.name : '';
+                const weight = data.weight != null ? `: ${data.weight}` : '';
+                return `${name}${weight}`;
+            },
+        },
+    };
+}
+
+function defaultElements() {
+    return {
+        nodes: _.range(8).map(i => createNode(i, {
             name: names[i],
             weight: i,
-        };
-        return {
-            data: {
-                id: i,
-                data,
-                label: getLabel(data),
-            },
-        };
-    }),
-    edges: [
-        { data: { source: 0, target: 1 } },
-        { data: { source: 0, target: 2 } },
-        { data: { source: 1, target: 2 } },
-        { data: { source: 1, target: 3 } },
-        { data: { source: 3, target: 4 } },
-        { data: { source: 4, target: 5 } },
-        { data: { source: 5, target: 6 } },
-        { data: { source: 1, target: 7 } },
-    ],
+        })),
+        edges: [
+            createEdge(0, 1),
+            createEdge(0, 2),
+            createEdge(1, 2),
+            createEdge(1, 3),
+            createEdge(3, 4),
+            createEdge(4, 5),
+            createEdge(5, 6),
+            createEdge(1, 7),
+        ],
+    };
 };
 
 function serialize(cy) {
@@ -121,26 +142,11 @@ function deserialize(source) {
     const edges = [];
 
     for (const id of graph.nodes()) {
-        const data = graph.node(id);
-        nodes.push({
-            data: {
-                id,
-                data,
-                label: getLabel(data),
-            },
-        });
+        nodes.push(createNode(id, graph.node(id)));
     }
 
     for (const edge of graph.edges()) {
-        const data = graph.edge(edge.v, edge.w);
-        edges.push({
-            data: {
-                source: edge.v,
-                target: edge.w,
-                data: data,
-                label: getLabel(data),
-            },
-        });
+        edges.push(createEdge(edge.v, edge.w, graph.edge(edge.v, edge.w)));
     }
 
     return {
@@ -155,10 +161,10 @@ if (elements) {
     try {
         elements = deserialize(elements);
     } catch (e) {
-        elements = defaultElements;
+        elements = defaultElements();
     }
 } else {
-    elements = defaultElements;
+    elements = defaultElements();
 }
 
 export const cy = cytoscape({
@@ -352,7 +358,7 @@ export const graphControls = Vue.createApp({
         },
         reset() {
             cy.remove(cy.elements());
-            cy.add(defaultElements);
+            cy.add(defaultElements());
             this.applyLayout();
         },
     },
@@ -388,17 +394,13 @@ cy.on('tap', (evt) => {
         weight: id,
     };
 
-    cy.add({
-        data: {
-            id,
-            data,
-            label: getLabel(data),
-        },
-        position: {
-            x: evt.position.x,
-            y: evt.position.y,
-        },
-    });
+    const node = createNode(id, data);
+    node.position = {
+        x: evt.position.x,
+        y: evt.position.y,
+    };
+
+    cy.add(node);
 
     id++;
 });
@@ -423,7 +425,6 @@ function doubleTap(evt) {
         data = { name: dataStr };
     }
     tgt.data('data', data);
-    tgt.data('label', getLabel(data));
 }
 
 cy.on('dbltap', 'node', doubleTap);
