@@ -308,7 +308,7 @@ export const graphControls = Vue.createApp({
         },
         viewSource(newValue, oldValue) {
             if (newValue) {
-                const source = this.serialize(cy);
+                const source = serialize(cy);
                 this.graphSourceControls.show(source);
             } else {
                 this.graphSourceControls.hide();
@@ -345,8 +345,7 @@ export const graphControls = Vue.createApp({
             this.newNodesEnabled = this.newNodesEnabledPrev;
         },
         showGraph(source) {
-
-
+            const elements = deserialize(source);
             cy.remove(cy.elements());
             cy.add(elements);
             this.applyLayout();
