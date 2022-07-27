@@ -103,6 +103,9 @@
             <div id="graph-source-controls" class="d-none">
                 <button type="button" class="btn btn-primary m-2" @click="save" :disabled="disabled">&nbsp; Save &nbsp;</button>
                 <button type="button" class="btn btn-outline-primary m-2" @click="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary m-2" @click="upload">Upload</button>
+                <input type="file" id="formFile" class="d-none" @change="fileSelected">
+                <button type="button" class="btn btn-primary m-2" @click="download">Download</button>
             </div>
         </div>
 

@@ -44,6 +44,38 @@ export function initGraphSourceControls(graphControls) {
                 document.querySelector('#stack-controls').classList.remove('d-none');
                 document.querySelector('#stack').classList.remove('d-none');
             },
+            upload() {
+                const fileInput = document.getElementById('formFile');
+                fileInput.click();
+            },
+            fileSelected(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = e => {
+                    var contents = e.target.result;
+                    graphSource.setValue(contents);
+                    this.save();
+                };
+                reader.readAsText(file);
+            },
+            download() {
+                const source = graphSource.getValue();
+                const blob = new Blob([source], {
+                    type: 'text/plain',
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'graph.gv';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
         },
     }).mount('#graph-source-controls');
 }
