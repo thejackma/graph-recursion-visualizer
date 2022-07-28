@@ -55,40 +55,32 @@ if (!layout || !layouts.hasOwnProperty(layout)) {
     layout = defaultLayout;
 }
 
-function createNode(id, data) {
+function createNode(id, userData) {
     return {
-        data: {
+        data: Object.assign({
             id,
-            data,
             get label() {
-                const data = this.data;
-                if (!data) {
-                    return null;
-                }
-                const name = data.name != null ? data.name : '';
-                const weight = data.weight != null ? `: ${data.weight}` : '';
+                const name = this.name != null ? this.name : '';
+                const weight = this.weight != null ? `: ${this.weight}` : '';
                 return `[${this.id}] ${name}${weight}`;
             },
-        },
+            set label(value) { },
+        }, userData),
     };
 }
 
-function createEdge(source, target, data) {
+function createEdge(source, target, userData) {
     return {
-        data: {
+        data: Object.assign({
             source,
             target,
-            data,
             get label() {
-                const data = this.data;
-                if (!data) {
-                    return null;
-                }
-                const name = data.name != null ? data.name : '';
-                const weight = data.weight != null ? `: ${data.weight}` : '';
+                const name = this.name != null ? this.name : '';
+                const weight = this.weight != null ? `: ${this.weight}` : '';
                 return `${name}${weight}`;
             },
-        },
+            set label(value) { },
+        }, userData),
     };
 }
 
@@ -116,8 +108,10 @@ function serialize(cy) {
 
     for (const node of cy.nodes()) {
         const id = safeParseInt(node.id());
-        const data = node.data().data;
-        if (data && data.hasOwnProperty('weight')) {
+        const data = JSON.parse(JSON.stringify(node.data()));
+        delete data.id;
+        delete data.label;
+        if (data.weight != null) {
             data.weight = safeParseInt(data.weight);
         }
         digraph.setNode(id, data);
@@ -126,8 +120,12 @@ function serialize(cy) {
     for (const edge of cy.edges()) {
         const source = safeParseInt(edge.source().id());
         const target = safeParseInt(edge.target().id());
-        const data = edge.data().data;
-        if (data && data.hasOwnProperty('weight')) {
+        const data = JSON.parse(JSON.stringify(edge.data()));
+        delete data.id;
+        delete data.source;
+        delete data.target;
+        delete data.label;
+        if (data.weight != null) {
             data.weight = safeParseInt(data.weight);
         }
         digraph.setEdge(source, target, data);
@@ -369,7 +367,7 @@ const remainingNames = new Set(names);
 let id = cy.nodes().length;
 
 for (let node of cy.nodes()) {
-    remainingNames.delete(node.data().data.name);
+    remainingNames.delete(node.data().name);
 }
 
 cy.on('tap', (evt) => {
@@ -432,7 +430,7 @@ cy.on('dbltap', 'edge', doubleTap);
 
 cy.on('cxttap', 'node', (evt) => {
     var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-    const name = tgt.data().data.name;
+    const name = tgt.data().name;
     if (nameSet.has(name)) {
         remainingNames.add(name);
     }

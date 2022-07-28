@@ -124,7 +124,7 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
             },
             _runUserFunction() {
                 if (this.operations) {
-                    return;
+                    return true;
                 }
 
                 const enter = `
@@ -161,12 +161,39 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
                     return __dfsRun(__dfsNodes);
                 `;
 
+                for (const element of cy.elements()) {
+                    if (!element.hasOwnProperty('name')) {
+                        Object.defineProperty(element, 'name', {
+                            get() {
+                                return this.data().name;
+                            },
+                            set(value) {
+                                this.data().name = value;
+                            },
+                        });
+                    }
+                    if (!element.hasOwnProperty('weight')) {
+                        Object.defineProperty(element, 'weight', {
+                            get() {
+                                return this.data().weight;
+                            },
+                            set(value) {
+                                this.data().weight = value;
+                            },
+                        });
+                    }
+                }
+
                 const func = new Function('__dfsNodes', code);
                 try {
                     this.operations = func(cy.nodes());
                 } catch (e) {
                     alert(e);
                     return false;
+                }
+
+                for (const element of cy.elements()) {
+                    element.data(element.data());
                 }
 
                 editor.updateOptions({ readOnly: true });
