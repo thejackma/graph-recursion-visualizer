@@ -175,6 +175,7 @@ export const cy = cytoscape({
             selector: 'node[label], edge[label]',
             style: {
                 'label': 'data(label)',
+                'font-size': 10,
             },
         },
         {
