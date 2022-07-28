@@ -34,8 +34,7 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
                 if (this.playIntervalId) {
                     this._pause();
                 } else {
-                    this._runUserFunction();
-                    if (!this.operations) {
+                    if (!this._runUserFunction()) {
                         return;
                     }
                     this._forwardOrPause();
@@ -78,8 +77,7 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
             },
             forward() {
                 this._pause();
-                this._runUserFunction();
-                if (!this.operations) {
+                if (!this._runUserFunction()) {
                     return;
                 }
                 this._forward();
@@ -168,13 +166,15 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
                     this.operations = func(cy.nodes());
                 } catch (e) {
                     alert(e);
-                    return;
+                    return false;
                 }
 
                 editor.updateOptions({ readOnly: true });
                 document.getElementById('monaco-overlay').classList.remove('d-none');
                 graphControls.disable();
                 graphSourceControls.disable();
+
+                return this.operations.length > 0;
             },
             async applyCodeExample(exampleName) {
                 const example = await fetchCodeExample(exampleName);
