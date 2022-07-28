@@ -103,14 +103,25 @@ function defaultElements() {
     };
 };
 
+function cleanupNode(data) {
+    delete data.id;
+    delete data.label;
+}
+
+function cleanupEdge(data) {
+    delete data.id;
+    delete data.source;
+    delete data.target;
+    delete data.label;
+}
+
 function serialize(cy) {
     const digraph = new graphlib.Graph();
 
     for (const node of cy.nodes()) {
         const id = safeParseInt(node.id());
         const data = JSON.parse(JSON.stringify(node.data()));
-        delete data.id;
-        delete data.label;
+        cleanupNode(data);
         if (data.weight != null) {
             data.weight = safeParseInt(data.weight);
         }
@@ -121,10 +132,7 @@ function serialize(cy) {
         const source = safeParseInt(edge.source().id());
         const target = safeParseInt(edge.target().id());
         const data = JSON.parse(JSON.stringify(edge.data()));
-        delete data.id;
-        delete data.source;
-        delete data.target;
-        delete data.label;
+        cleanupEdge(data);
         if (data.weight != null) {
             data.weight = safeParseInt(data.weight);
         }
@@ -410,20 +418,36 @@ function doubleTap(evt) {
     }
 
     var tgt = evt.target || evt.cyTarget; // 3.x || 2.x
-    const dataStr = prompt('Data', JSON.stringify(tgt.data().data));
+    let data = JSON.parse(JSON.stringify(tgt.data()));
+    if (tgt.isNode()) {
+        cleanupNode(data);
+    } else {
+        cleanupEdge(data);
+    }
+    const dataStr = prompt('Data', JSON.stringify(data));
     if (dataStr == null) {
         return;
     }
-    let data;
     try {
         data = JSON.parse(dataStr);
-        if (typeof data !== 'object') {
-            data = { name: dataStr };
-        }
     } catch (e) {
-        data = { name: dataStr };
+        alert('Wrong format');
+        return;
     }
-    tgt.data('data', data);
+
+    if (typeof data !== 'object') {
+        alert('Wrong format');
+        return;
+    }
+    let element;
+    if (tgt.isNode()) {
+        cleanupNode(data);
+        element = createNode(tgt.id(), data);
+    } else {
+        cleanupEdge(data);
+        element = createEdge(0, 0, data);
+    }
+    tgt.data(element.data);
 }
 
 cy.on('dbltap', 'node', doubleTap);
