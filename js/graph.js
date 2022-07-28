@@ -431,12 +431,12 @@ function doubleTap(evt) {
     try {
         data = JSON.parse(dataStr);
     } catch (e) {
-        alert('Wrong format');
+        alert('Invalid JSON format\n' + dataStr);
         return;
     }
 
     if (typeof data !== 'object') {
-        alert('Wrong format');
+        alert('Invalid JSON format\n' + dataStr);
         return;
     }
     let element;
