@@ -1,5 +1,3 @@
-const visited = new Set();
-
 for (const node of nodes) {
     dfs(node);
 }

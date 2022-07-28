@@ -148,6 +148,7 @@ export function initExecutionControls(cy, graphControls, graphSourceControls, ed
                 const code = `
                     function __dfsRun(nodes) {
                         const __dfsOperations = [];
+                        const visited = new Set();
 
                         function __dfsUserCode() {
                             ${userCode}
